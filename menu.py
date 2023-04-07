@@ -24,7 +24,7 @@ class SPL_MT_PoseMenu(Menu):
 			layout.menu("SPL_MT_ReplacePoseMenu", text="Replace...")
 
 
-from .props import get_active_poselib, get_active_book, get_active_pose, get_active_bone
+from .props import get_active_poselib, get_active_book, get_active_pose
 
 # Submenu: Replace Pose
 class SPL_MT_ReplacePoseMenu(Menu):
