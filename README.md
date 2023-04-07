@@ -1,6 +1,10 @@
-# Pose Library Plus
+# Sakura Poselib
 
-Pose Library Plus is an add-on for Blender 2.8 and later. It was created to replace the pose library, which will be gradually phased out in the Blender 3 series. With this add-on, you can easily save, manage, and apply poses.
+Sakura Poselib is an add-on for Blender. It was created to replace the pose library, which will be gradually phased out in the Blender 3 series. With this add-on, you can easily save, manage, and apply poses.
+
+# Supported Version
+
+Blender 2.8 or later
 
 ## Features
 
@@ -15,29 +19,22 @@ Pose Library Plus is an add-on for Blender 2.8 and later. It was created to repl
   - Individual bone editing. The bone list of the selected pose is displayed in the panel, where you can edit bone names and transforms.
   - Pose mixing. Adjust the degree of pose application with sliders for each pose, and check the combined state of multiple poses.
     - Note: This is not suitable for animation purposes, such as setting keyframes.
+    - Animation compatible pose features will be supported in feature releases.
+  - Track bone name changes. When you rename bones in the armature, bone names in pose data will be also changed. 
 
 - Compatibility:
-  - Old pose library: Import and use the old format.
+  - Old pose library: Import from old pose library / Export to old pose library (Supports up to Blender 3.4),
   - mmd_tools: Import existing bone morphs or convert the pose list to bone morphs.
   - json: Save and load pose lists as json files.
 
-## Installation
-
-To install Pose Library Plus, follow these steps:
-
-1. Download the ZIP file for Pose Library Plus.
-2. Open Blender, click "Edit" -> "Preferences" -> "Add-ons".
-3. Click "Install" and select the downloaded ZIP file.
-4. Click "Install Add-on" to install Pose Library Plus.
-
 ## Version History
 
-- 2023/04/01
-  - v1.0: Initial release
+- 2023/04/10: Version 0.1
+  - Initial release
 
 ## Usage
 
-Upon installing this add-on, a Sakura Poselib item will appear in the properties panel of the armature in pose mode. Poses are saved in the list within this item. The panel buttons allow for similar operations as the old pose library.
+Upon installing this add-on, a Sakura Poselib item will appear in the properties panel of the armature. Poses are saved in the list within this item. The panel buttons allow for similar operations as the old pose library.
 
 In pose mode, you can use the following hotkeys:
 
@@ -48,6 +45,10 @@ In pose mode, you can use the following hotkeys:
 
 The author is not responsible for any results from using this add-on. Please use it at your own risk.
 
+# License
+
+MIT License.
+
 ## Author
 
-Sakura Poselib (c) by Kafuji Sato, All rights reserved.
+Kafuji Sato / VR Character Workshop
