@@ -21,6 +21,7 @@ Blender 2.8 or later
     - Note: This is not suitable for animation purposes, such as setting keyframes.
     - Animation compatible pose features will be supported in feature releases.
   - Track bone name changes. When you rename bones in the armature, bone names in pose data will be also changed. 
+  - Free from bone rotation modes. Pose data is stored as quaternion rotation and will be automatically converted into current bone's rotation mode when applying pose to armature.
 
 - Compatibility:
   - Old pose library: Import from old pose library / Export to old pose library (Supports up to Blender 3.4),

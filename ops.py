@@ -105,7 +105,7 @@ class SPL_OT_SendToMMDTools( bpy.types.Operator ):
 			return False
 
 		# Check if mmd_tools is installed and the armature is an MMD model
-		if not mmd.is_mmd_tools_installed() or not mmd.get_mmd_root(arm):
+		if not mmd.is_mmd_tools_installed() or not mmd.get_model_root(arm):
 			return False
 
 		book = get_active_book(arm.sakura_poselib)
@@ -142,7 +142,7 @@ class SPL_OT_LoadFromMMDTools( bpy.types.Operator ):
 			return False
 
 		# Check if mmd_tools is installed and the armature is an MMD model
-		if not mmd.is_mmd_tools_installed() or not mmd.get_mmd_root(arm):
+		if not mmd.is_mmd_tools_installed() or not mmd.get_model_root(arm):
 			return False
 
 		# All checks passed
