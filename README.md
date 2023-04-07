@@ -4,7 +4,7 @@ Sakura Poselib is an add-on for Blender. It was created to replace the pose libr
 
 # Supported Version
 
-Blender 2.8 or later
+Blender 2.8 or later (Export/Import from old pose library is supported up to 3.4)
 
 ## Features
 
