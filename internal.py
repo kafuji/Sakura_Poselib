@@ -359,13 +359,12 @@ _POSE_CATEGORIES = [
 
 
 # Save PoseBook into a file (CSV)
-def save_book_to_csv( book, filename):
+def save_book_to_csv( book, filename, scale=12.5 ):
 	poses = book.poses
 	obj: bpy.types.Object = book.id_data
 	arm: bpy.types.Armature = obj.data
 	matrix_world = obj.matrix_world
 	bone_util_cls = mmd.BoneConverterPoseMode if arm.pose_position != 'REST' else mmd.BoneConverter
-	scale = 12.5
 
 	class _RestBone:
 		def __init__(self, b:bpy.types.PoseBone):
@@ -435,8 +434,32 @@ def save_book_to_csv( book, filename):
 
 
 # Load PoseBook from a file (CSV)
-def load_book_from_csv( book, filename ):
+def load_book_from_csv( book, filename, scale=0.08 ):
 	poses = book.poses
+	obj: bpy.types.Object = book.id_data
+	poses = book.poses
+	obj: bpy.types.Object = book.id_data
+	arm: bpy.types.Armature = obj.data
+	matrix_world = obj.matrix_world
+	bone_util_cls = mmd.BoneConverterPoseMode if arm.pose_position != 'REST' else mmd.BoneConverter
+
+	class _RestBone:
+		def __init__(self, b:bpy.types.PoseBone):
+			self.matrix_local = matrix_world @ b.bone.matrix_local
+
+	class _PoseBone: # world space
+		def __init__(self, b:bpy.types.PoseBone):
+			self.bone = _RestBone(b)
+			self.matrix = matrix_world @ b.matrix
+			self.matrix_basis = b.matrix_basis
+			self.location = b.location
+
+	converter_cache = {}
+	def _get_converter(b):
+		if b not in converter_cache:
+			converter_cache[b] = bone_util_cls(_PoseBone(b), scale, invert=False )
+		return converter_cache[b]
+	
 
 	# Format:
 	# line starts with ';' is comment. just discard.
@@ -493,12 +516,21 @@ def load_book_from_csv( book, filename ):
 					print(f'Pose "{pose_name}" is not found. Creating a new pose.')
 
 				bone_name = row[3].strip('"')
-				loc = Vector( (float(row[4]), float(row[5]), float(row[6])) ) / 12.5
-				rot = (float(row[7]), float(row[8]), float(row[9]))
+				loc = Vector( (float(row[4]), float(row[5]), float(row[6])) ) 
+				rot = Vector( (float(row[7]), float(row[8]), float(row[9])) )
 
-				# convert to quaternion
-				rot = mmd.dgrees_to_quaternion( rot )
-			
+				# convert to blender unit
+				pbone = obj.pose.bones.get(bone_name)
+				if pbone is None:
+					print(f'Warning: Bone "{bone_name}" not found in "{obj.name}", skippping...')
+					continue
+
+				# use bone converter from mmd_tools to convert bone location and rotation to MMD unit
+				converter = _get_converter(pbone) 
+				loc = converter.convert_location( loc )
+				rot = mmd.degrees_to_quaternion( rot )
+				rot = converter.convert_rotation( [rot.x, rot.y, rot.z, rot.w] )
+
 				# add a bone data
 				bone = pose.bones.add()
 				bone.name = bone_name

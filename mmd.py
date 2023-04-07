@@ -98,3 +98,8 @@ class BoneConverterPoseMode:
 def quaternion_to_degrees( q:Quaternion ) -> Vector:
     euler = q.to_euler()
     return Vector( (euler.x, euler.y, euler.z) ) * (180 / 3.141592653589793)
+
+# Euler degrees to Quaternion. BoneConverter.convert_rotation() needs xyzw
+def degrees_to_quaternion( v:Vector ) -> Quaternion:
+    euler = Vector( (v.x, v.y, v.z) ) * (3.141592653589793 / 180)
+    return Quaternion( euler )
