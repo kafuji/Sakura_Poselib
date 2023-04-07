@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Panel
 from bpy.types import UIList
 
-from .props import get_poselib_plus, get_active_book
+from .props import get_active_poselib, get_active_book
 
 # UIList for displaying the poses categories in Sakura Poselib
 class SPL_UL_PoseCategoryList(UIList):
@@ -91,7 +91,7 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 
 	def draw(self, context):
 		l = self.layout
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 
 		# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
@@ -186,7 +186,7 @@ class SPL_PT_PoseBoneData(Panel):
 	def draw(self, context):
 		l = self.layout
 
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book:
 			l.label(text="Select any pose.", icon='INFO')

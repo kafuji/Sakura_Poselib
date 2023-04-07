@@ -12,7 +12,7 @@ class SPL_MT_PoseMenu(Menu):
 		layout = self.layout
 		layout.operator("spl.add_pose", text="New")
 
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book:
 			return
@@ -24,7 +24,7 @@ class SPL_MT_PoseMenu(Menu):
 			layout.menu("SPL_MT_ReplacePoseMenu", text="Replace...")
 
 
-from .props import get_poselib_plus, get_active_book, get_active_pose, get_active_bone
+from .props import get_active_poselib, get_active_book, get_active_pose, get_active_bone
 
 # Submenu: Replace Pose
 class SPL_MT_ReplacePoseMenu(Menu):
@@ -34,7 +34,7 @@ class SPL_MT_ReplacePoseMenu(Menu):
 	def draw(self, context):
 		layout = self.layout
 
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book:
 			return

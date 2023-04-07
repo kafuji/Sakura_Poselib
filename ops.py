@@ -9,7 +9,7 @@ import math
 from . import mmd
 from . import internal
 
-from .props import get_poselib_plus, get_active_book, get_active_pose, get_active_bone
+from .props import get_active_poselib, get_active_book, get_active_pose, get_active_bone
 
 # checkver: Check blender if pose_library attribute 
 def checkver(armature: bpy.types.Object) -> bool:
@@ -49,8 +49,8 @@ class SPL_OT_LoadFromPoseLibrary( bpy.types.Operator ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
-		book = spl.books.add()
+		spl = get_active_poselib(context)
+		book = spl.add_book()
 		spl.active_book_index = len(spl.books) - 1
 
 		internal.convert_from_poselib(book)
@@ -117,7 +117,7 @@ class SPL_OT_SendToMMDTools( bpy.types.Operator ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book or not book.poses:
 			self.report({'ERROR'}, "PoseBook is not selected or empty")
@@ -151,9 +151,9 @@ class SPL_OT_LoadFromMMDTools( bpy.types.Operator ):
 	# Execute the operator
 	def execute(self, context):
 		arm = context.object
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 
-		book = spl.books.add()
+		book = spl.add_book()
 		book.name = f"{arm.name}+_bonemorph"
 		spl.active_book_index = len(spl.books) - 1
 
@@ -177,13 +177,13 @@ class SPL_OT_SaveToJson( bpy.types.Operator, ExportHelper ):
 
 	@classmethod
 	def poll(cls, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		return book and book.poses
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book or not book.poses:
 			self.report({'ERROR'}, "PoseBook is not selected or empty")
@@ -211,8 +211,8 @@ class SPL_OT_LoadFromJson( bpy.types.Operator, ImportHelper ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
-		book = spl.books.add()
+		spl = get_active_poselib(context)
+		book = spl.add_book()
 		spl.active_book_index = len(spl.books) - 1
 
 		# Load poses from file
@@ -238,13 +238,13 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
 
 	@classmethod
 	def poll(cls, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		return book and book.poses
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book or not book.poses:
 			self.report({'ERROR'}, "PoseBook is not selected or empty")
@@ -272,8 +272,8 @@ class SPL_OT_LoadFromCSV( bpy.types.Operator, ImportHelper ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
-		book = spl.books.add()
+		spl = get_active_poselib(context)
+		book = spl.add_book()
 		spl.active_book_index = len(spl.books) - 1
 
 		# Load poses from file
@@ -299,10 +299,10 @@ class SPL_OT_AddPoseBook( bpy.types.Operator ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 
 		# Add a new category
-		book = spl.books.add()
+		book = spl.add_book()
 		book.name = "New PoseBook"
 		spl.active_book_index = len(spl.books) - 1
 
@@ -322,7 +322,7 @@ class SPL_OT_RemovePoseBook( bpy.types.Operator ):
 
 	# Execute the operator
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 
 		# Remove the selected category
 		index = spl.active_book_index
@@ -406,10 +406,11 @@ class SPL_OT_AddPose( bpy.types.Operator ):
 
 	def execute(self, context):
 		arm = context.object
-		book = get_active_book(arm.sakura_poselib)
+		spl = get_active_poselib(context)
+		book = get_active_book(spl)
 
 		if not book: # Create new
-			book = arm.sakura_poselib.books.add()
+			book = spl.add_book()
 			book.name = "New PoseBook"
 
 		# Create new pose container
@@ -537,7 +538,7 @@ class SPL_OT_AutoSetPoseCategory( bpy.types.Operator ):
 		return True
 
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 
 		if not book:
@@ -759,7 +760,7 @@ class SPL_OT_MovePoseBook( bpy.types.Operator ):
 	)
 
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book_index = spl.active_book_index
 
 		# Check index is valid
@@ -786,7 +787,7 @@ class SPL_OT_ResetPoseBook( bpy.types.Operator ):
 	bl_options = {'REGISTER', 'UNDO'}
 
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 
 		# Reset all pose values
@@ -851,7 +852,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
 	bl_label = "Sakura Poselib Pose Preview"
 
 	def modal(self, context, event):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 
 		if not book:
@@ -910,7 +911,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
 	def invoke(self, context, event):
 
 		# Apply the active pose
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 		book = get_active_book(spl)
 		if not book:
 			self.report({'WARNING'}, "No PoseBook found, cannot run operator")
@@ -969,7 +970,7 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator):
 		return context.object is not None and context.object.type == 'ARMATURE'
 
 	def execute(self, context):
-		spl = get_poselib_plus(context)
+		spl = get_active_poselib(context)
 
 		# Get all pose lists
 		for pose_list in spl.pose_lists:

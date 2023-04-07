@@ -88,17 +88,36 @@ class PoseBook(PropertyGroup):
 	active_pose_index: IntProperty()
 
 # Root Container
-class PoseLibPlusData(PropertyGroup):
+class PoselibData(PropertyGroup):
 	books: CollectionProperty(type=PoseBook) # PoseBooks
 	active_book_index: IntProperty()
+
+	# wrapper for adding new posebook, ensure creating backup bone names and set active book index
+	def add_book(self):
+		if len(self.books) == 0:
+			# create bone name backups
+			arm = self.id_data
+			for bone in arm.data.bones:
+				bone["spl_bone_name_backup"] = bone.name
+
+		book = self.books.add()
+		self.active_book_index = len(self.books) - 1
+
+		return book
 
 
 ###################################################
 # Helpers for user of this module
 ###################################################
 
-# Get Root Property
-def get_poselib_plus( context: bpy.types.Context ) -> PoseLibPlusData:
+# Get Root Property from Object
+def get_poselib( obj: bpy.types.Object ) -> PoselibData:
+	if not obj or obj.type != 'ARMATURE':
+		return None
+	return obj.sakura_poselib
+
+# Get Root Property from Context
+def get_active_poselib( context: bpy.types.Context ) -> PoselibData:
 	armature = context.object
 	if not armature or armature.type != 'ARMATURE':
 		return None
@@ -106,7 +125,7 @@ def get_poselib_plus( context: bpy.types.Context ) -> PoseLibPlusData:
 	return armature.sakura_poselib
 
 # Get Active Category
-def get_active_book( spl: PoseLibPlusData ) -> PoseBook:
+def get_active_book( spl: PoselibData ) -> PoseBook:
 	if not spl.books:
 		return None
 
@@ -159,14 +178,14 @@ classes = (
 	BoneTransform,
 	PoseItem,
 	PoseBook,
-	PoseLibPlusData,
+	PoselibData,
 	PoseLibPlusScreen,
 )
 
 def register():
 	for cls in classes:
 		bpy.utils.register_class(cls)
-	bpy.types.Object.sakura_poselib = PointerProperty(type=PoseLibPlusData)
+	bpy.types.Object.sakura_poselib = PointerProperty(type=PoselibData)
 	bpy.types.Screen.sakura_poselib = PointerProperty(type=PoseLibPlusScreen)
 
 def unregister():

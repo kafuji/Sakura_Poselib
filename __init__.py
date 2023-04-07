@@ -19,7 +19,7 @@ module_names = [
 	"panel",
 	"menu",
 	"hotkey",
-	#"handlers"
+	"handlers",
 ]
 
 
