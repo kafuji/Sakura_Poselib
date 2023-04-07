@@ -26,9 +26,12 @@ O	Load from Json	Jsonファイルから読み込み
 
 O	Load from CSV	CSVファイルから読み込み
 *	Load a PoseBook from a CSV file (compatible with PMX Editor)	CSVファイル(PMX Editor 互換)からポーズブックを読み込みます
+*	Scale factor (MMD -> Blender)	スケールファクター（MMD -> Blender）
+
 
 O	Save to CSV	CSVファイルに書き出し
 *	Save active PoseBook to a CSV file (compatible with PMX Editor)	アクティブなポーズブックをCSVファイル(PMX Editor互換)に書き出します
+*	Scale factor (Blender -> MMD)	スケールファクター（Blender -> MMD）
 
 *	Replace (Current)	置き換え（現在のポーズ）
 *	Replace...	置き換え...

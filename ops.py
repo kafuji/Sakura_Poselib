@@ -236,6 +236,14 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
 	filter_glob: StringProperty(default="*.csv", options={'HIDDEN'})
 	filename_ext = '.csv'
 
+	scale: FloatProperty(
+		name="Scale",
+		description="Scale factor (Blender -> MMD)",
+		default=12.5,
+		min=1.0,
+		max=100.0,
+	)
+
 	@classmethod
 	def poll(cls, context):
 		spl = get_active_poselib(context)
@@ -251,7 +259,7 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
 			return False
 
 		# Save poses to file
-		internal.save_book_to_csv(book, self.filepath)
+		internal.save_book_to_csv(book, self.filepath, self.scale )
 
 		return {'FINISHED'}
 
@@ -266,6 +274,14 @@ class SPL_OT_LoadFromCSV( bpy.types.Operator, ImportHelper ):
 	filter_glob: StringProperty(default="*.csv", options={'HIDDEN'})
 	filename_ext = '.csv'
 
+	scale: FloatProperty(
+		name="Scale",
+		description="Scale factor (MMD -> Blender)",
+		default=0.08,
+		min=1.0,
+		max=100.0,
+	)
+
 	@classmethod
 	def poll(cls, context):
 		return context.object and is_armature(context.object)
@@ -277,7 +293,7 @@ class SPL_OT_LoadFromCSV( bpy.types.Operator, ImportHelper ):
 		spl.active_book_index = len(spl.books) - 1
 
 		# Load poses from file
-		internal.load_book_from_csv(book, self.filepath)
+		internal.load_book_from_csv(book, self.filepath, self.scale )
 		return {'FINISHED'}
 
 	# Invoke the operator
