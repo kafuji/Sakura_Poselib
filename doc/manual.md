@@ -20,7 +20,7 @@ After installing the addon, Sakura Poselib panel will be added on Armature Prope
 
 PoseBook is a collection of poses in Sakura Poselib. An armature can store multiple PoseBooks. This is similar to former pose library's 'action'.
 
-Different from action, PoseBook is not a collection of keyframes. PoseBook stores poses as colleciton of { pose_name: bone_daga } structure.
+Different from action, PoseBook is not a collection of keyframes. PoseBook stores poses as colleciton of { pose_name: bone_data } structure.
 
 ### Pose
 
