@@ -1,15 +1,22 @@
-# Sakura Poselib
+# Sakura PoseLib User Guide
+
+Current Version: 1.0.0
+
+## Introduction
+
+Sakura Poselib is an add-on for Blender. It was created to replace the pose library, which was gradually phased out in the Blender 3 series. With this add-on, you can easily save, manage, and apply poses.
+
+This addon designed to be compatible with mmd_tools and PMX Editor. It can also import and export from old pose library.
+
 
 ## Installation
 
-To install Pose Library Plus, follow these steps:
+To install Sakura PoseLib, follow these steps:
 
-1. Download the ZIP file for Pose Library Plus.
+1. Download the ZIP file for Sakura PoseLib from [Github Release Page](https://github.com/kafuji/Sakura_Poselib/releases).
 2. Open Blender, click "Edit" -> "Preferences" -> "Add-ons".
 3. Click "Install" and select the downloaded ZIP file.
-4. Click "Install Add-on" to install Pose Library Plus.
-
-## GUI
+4. Click "Install Add-on" to install Sakura PoseLib.
 
 After installing the addon, Sakura Poselib panel will be added on Armature Properites Panel.
 
@@ -36,14 +43,14 @@ During this process, invisible bones are ignored, so you can prevent adding unne
 
 Same as adding pose, you can replace existing pose with current pose. Unnecessary bones will be remoded form pose data in this process.
 
-
 ### Preview Poses / Combined Pose
 
 In the pose list of Sakura Poselib, there is a slider on each pose.
 You can adjust each value to preview combined pose.
 You can also create mixed pose by adding new pose while previewing.
 
-Notice: This feature is not compatible with blender animation system. Designed for just preview purpose.
+- Notice: This feature is currently not compatible with blender animation system. Designed for just preview purpose.
+- Poses from Sakura PoseLib does not constrain your Armature. You can freely move/reset poses while Pose values are active.
 
 ### Import/Export
 
@@ -54,11 +61,10 @@ If you need to retrieve several old pose library data, it is recommended to use 
 
 Sakura Poselib can also export it's PoseBook to old pose library, but it is not recommended to use this feature because pose library is absolutely deplecated from Blender 3.5 (Replaced with Pose Assets type pose library).
 
-#### From MMD_Tools
+#### From mmd_tools
 
 Sakura Poselib can use MMD models bone morph data as Pose Library by importing from a MMD model that is created by MMD_Tools.
 You can also export your PoseBook to MMD model by using export feature in Sakura Poselib.
-
 
 #### From File (Json and CSV)
 
@@ -85,7 +91,40 @@ If your pose data become invalid by renaming bones, be careful to use this (Tran
 This is a background handler type feature.
 This addon automatically track bone renames and maintain pose data healthy when renames detected.
 
+#### Bone Rename Tool
+
+This is a tool to rename bones in pose data. It is useful when you want to retarget PoseBooks to another model.
+
+## Technical Notes
+
+- This addon is not compatible with Blender's animation system.
+  - You can make pose, preview pose, and export them for MMD.
+
+- Sakura ToolBox addon for Blender can handle Sakura PoseLib's PoseBook data.
+  - You can convert poses to Shape Keys.
+
+- Sakura Poselib's Data Layout: (see props.py for more details)
+  - bpy.types.Object.pose_library_plus
+    - Books: Colleciton of PoseBook
+      - name: PoseBook name
+      - Poses: Colleciton of Pose
+        - Pose: { pose_name: list of BoneTransform }
+          - name: Pose name
+          - Bones: Colleciton of BoneTransform
+            - BoneTransform: { bone_name: location(Vector3), rotation(Quaternion), scale(Vector3) }
+
+- You can use Sakura Poselib's PoseBook data for any purposes.
+  - See the source code for more details.
+
+## Feature Plans
+
+- [ ] PoseBook to Pose Asset converter and vice versa.
+- [ ] Make PoseBook compatible with Blender's animation system by using
 
 
+## Author
 
-
+- Kafuji Sato / VR Character Workshop
+    - Twitter: [@kafuji](https://twitter.com/kafuji)
+    - Website: [VR Character Workshop](https://vr-character-workshop.com/)
+    - Github: [kafuji]([http](https://github.com/kafuji)

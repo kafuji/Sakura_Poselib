@@ -30,7 +30,7 @@ Blender 2.8 or later (Export/Import from old pose library is supported up to 3.4
 
 ## Version History
 
-- 2023/04/10: Version 0.1
+- 2023/04/15: Version 1.0.0
   - Initial release
 
 ## Usage
