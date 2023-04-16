@@ -631,14 +631,23 @@ class SPL_OT_CleanPoses( bpy.types.Operator ):
 	bl_description = "Remove unused/invalid bones in poses within the active posebook"
 	bl_options = {'REGISTER', 'UNDO'}
 
+	report_only: BoolProperty(
+		name="Report Only",
+		description="Only report unused/invalid bones, do not remove them",
+		default=False
+	)
+
 	@classmethod
 	def poll(cls, context):
 		arm = context.object
 		book = get_active_book(arm.sakura_poselib)
 		if not book or not book.poses:
 			return False
-		
 		return True
+
+	# Show Options first
+	def invoke(self, context, event):
+		return context.window_manager.invoke_props_dialog(self)
 
 	def execute(self, context):
 		arm = context.object
@@ -661,10 +670,12 @@ class SPL_OT_CleanPoses( bpy.types.Operator ):
 
 			# Remove the bones
 			for bone_name,reason in bone_to_remove.items():
-				pose.bones.remove(pose.bones.find(bone_name))
-				self.report({'INFO'}, "Removed bone '{}' from pose '{}' - {}".format(bone_name, pose.name, reason))
+				if not self.report_only:
+					pose.bones.remove(pose.bones.find(bone_name))
+				self.report({'INFO'}, "Bone '{}' in pose '{}' - {}".format(bone_name, pose.name, reason))
 
-			pose.active_bone_index = max( 0, min(pose.active_bone_index, len(pose.bones)-1) )
+			if not self.report_only:
+				pose.active_bone_index = max( 0, min(pose.active_bone_index, len(pose.bones)-1) )
 
 		return {'FINISHED'}
 
@@ -989,8 +1000,8 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator):
 		spl = get_active_poselib(context)
 
 		# Get all pose lists
-		for pose_list in spl.pose_lists:
-			for pose in pose_list.poses:
+		for posebook in spl.books:
+			for pose in posebook.poses:
 				for bone_transform in pose.bones:
 					if self.use_regex:
 						try:
