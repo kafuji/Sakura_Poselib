@@ -171,8 +171,6 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 			l.operator( 'spl.add_book', text='Add Pose List', icon='ADD')
 
 
-
-
 # Panel to display Sakura Poselib functionality in the properties panel
 class SPL_PT_PoseBoneData(Panel):
 	bl_label = "Pose Bone Data"
@@ -183,19 +181,32 @@ class SPL_PT_PoseBoneData(Panel):
 	bl_context = "data"
 	bl_options = {'DEFAULT_CLOSED'}
 
+	@classmethod
+	def poll(cls, context):
+		obj = context.object
+		if not obj or not obj.pose:
+			return False
+	
+		spl = get_active_poselib(context)
+		book = get_active_book(spl)
+		if not book or not book.poses:
+			return False
+		
+		return True
+
 	def draw(self, context):
 		l = self.layout
 
 		spl = get_active_poselib(context)
 		book = get_active_book(spl)
-		if not book:
-			l.label(text="Select any pose.", icon='INFO')
 		poses = book.poses
 		pose_index = book.active_pose_index
 
 		# Show Bone List and Transforms for selected pose
 		pose = poses[pose_index] if len(poses) > pose_index else None
-		if pose:
+		if not pose:
+			l.label(text="No active pose.", icon='INFO')
+		else:
 			box = l.box()
 			row = box.row()
 			row.prop(book, 'name', icon='OUTLINER_OB_ARMATURE')
@@ -209,7 +220,6 @@ class SPL_PT_PoseBoneData(Panel):
 			col.operator( 'spl.add_selected_bone_to_pose', text='', icon='ADD' )
 			col.separator()
 			col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = pose_index # select bones in pose
-
 
 			# show transforms for selected bone
 			bone = pose.bones[pose.active_bone_index] if len(pose.bones) > pose.active_bone_index else None
