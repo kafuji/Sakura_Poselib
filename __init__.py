@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "Sakura PoseLib",
 	"author": "Kafuji Sato",
-	"version": (0, 1, 1),
+	"version": (1, 0, 0),
 	"blender": (2, 93, 0),
 	"location": "Armature Properties > Sakura PoseLib",
 	"description": "Yet another pose library with handful of features",
