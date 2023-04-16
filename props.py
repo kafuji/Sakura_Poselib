@@ -60,8 +60,8 @@ class BoneTransform(PropertyGroup):
 	rotation: FloatVectorProperty(name="Rotation", size=4, default=(1, 0, 0, 0), subtype='QUATERNION') # Quartanion
 	scale: FloatVectorProperty(name="Scale", size=3, default=(1, 1, 1), subtype='XYZ')
 
-# Transforms for each Pose  
-class PoseItem(PropertyGroup):
+# Data for each pose  
+class PoseData(PropertyGroup):
 	name: StringProperty(name="Pose Name", default="New Pose", update=posename_resolve_collision_callback)
 
 	category: EnumProperty(
@@ -84,7 +84,7 @@ class PoseItem(PropertyGroup):
 # PoseBook (Collection of Poses)
 class PoseBook(PropertyGroup):
 	name: StringProperty(name="Book Name", default="New Book", update=posebookname_resolve_collision_callback)
-	poses: CollectionProperty(type=PoseItem)
+	poses: CollectionProperty(type=PoseData)
 	active_pose_index: IntProperty()
 
 # Root Container
@@ -136,7 +136,7 @@ def get_active_book( spl: PoselibData ) -> PoseBook:
 
 
 # Get Active Pose
-def get_active_pose( posebook: PoseBook ) -> PoseItem:
+def get_active_pose( posebook: PoseBook ) -> PoseData:
 	if posebook is None:
 		return None
 	if posebook.active_pose_index < 0 or posebook.active_pose_index >= len(posebook.poses):
@@ -146,7 +146,7 @@ def get_active_pose( posebook: PoseBook ) -> PoseItem:
 
 
 # Get Active Bone
-def get_active_bone( pose: PoseItem ) -> BoneTransform:
+def get_active_bone( pose: PoseData ) -> BoneTransform:
 	if pose is None:
 		return None
 	if pose.active_bone_index < 0 or pose.active_bone_index >= len(pose.bones):
@@ -176,7 +176,7 @@ class PoseLibPlusScreen(PropertyGroup):
 
 classes = (
 	BoneTransform,
-	PoseItem,
+	PoseData,
 	PoseBook,
 	PoselibData,
 	PoseLibPlusScreen,

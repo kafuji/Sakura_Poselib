@@ -41,6 +41,8 @@ O	Save to CSV	CSVファイルに書き出し
 *	Pose Bone Data	ポーズのボーンデータ：
 *	Book Name	ブック名：
 
+*	No active pose.	アクティブなポーズがありません。
+
 O	Add PoseBook	ポーズブックを追加
 *	Add a new PoseBook. PoseBook is a collection of poses	新しいポーズブックを追加します。ポーズブックはポーズのコレクションです
 
