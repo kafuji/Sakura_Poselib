@@ -1,6 +1,6 @@
 # Sakura Poselib
 
-Yet another pose library with a lot of handy features.
+***Yet another pose library with a lot of handy features.***
 
 ## Online Document
 
