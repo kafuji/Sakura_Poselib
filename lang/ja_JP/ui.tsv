@@ -68,7 +68,21 @@ O	Auto Set Pose Category	ポーズカテゴリを自動設定
 *	Automatically set the category of the poses in the PoseBook (guess from the pose name)	ポーズブック内のポーズのカテゴリを自動設定します（ポーズ名から推測）
 
 O	Clean Poses	ポーズデータを掃除
-*	Remove unused/invalid bones in poses within the active posebook	アクティブなポーズブック内のポーズの未使用/無効なボーンを削除します
+*	Remove/report unused/invalid bones in poses within the active posebook	アクティブなポーズブック内のポーズの未使用/無効なボーンを削除/報告します
+
+O	Move Pose to PoseBook	ポーズをポーズブックに移動
+*	Move the active pose to another PoseBook	アクティブなポーズを別のポーズブックに移動します
+*	Copy the pose instead of moving it	ポーズを移動する代わりにコピーします
+
+*	Check Bone Name	ボーン名前をチェック
+*	Remove/report bones with invalid names (which are not in the armature)	無効な名前のボーン（アーマチュアにないボーン）を削除/報告します
+
+*	Check Bone Transform	ボーン変形をチェック
+*	Remove bones which are not contributing to the pose (i.e. bones with minimal transform)	ポーズに影響を与えていないボーン（つまり、最小限の変形を持つボーン）を削除します
+*	Lower than this threshold, the bone is considered as not contributing to the pose	このしきい値より低い場合、ボーンはポーズに影響を与えていないと見なされます
+
+*	Report Only	報告のみ
+*	Show the report only (in the Inforation view), don't remove any bones	報告のみ表示（情報ビューに表示）し、ボーンを削除しません
 
 O	Pose Bone Data	ポーズのボーンデータ
 O	Remove Pose	ポーズを削除
@@ -87,9 +101,11 @@ O	Remove Bone from Pose	ポーズからボーンを削除
 *	Transforms:	変形一覧：
 
 *	Save / Load	保存 / 読み込み
-
+s
 O	Batch Rename Bones	ボーンを一括リネーム
-*	Batch rename bones in the all PoseBooks within the active Armature (for retargeting)	アクティブなアーマチュア内のすべてのポーズブックのボーンを一括リネームします（リターゲッティング用途）
+*	Rename bones within all Pose Data in the active PoseBook (useful for retargeting)	アクティブなポーズブック内のすべてのポーズデータのボーンを一括リネームします（リターゲティングに便利）
+*	Process All PoseBooks	すべてのポーズブックを処理
+
 
 *	Import/Export	インポート/エクスポート
 *	Batch Operations	一括操作

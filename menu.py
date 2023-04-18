@@ -2,6 +2,7 @@
 
 import bpy
 from bpy.types import Menu
+from .props import get_poselib_from_context
 
 # Main Menu in Pose Mode
 class SPL_MT_PoseMenu(Menu):
@@ -12,19 +13,18 @@ class SPL_MT_PoseMenu(Menu):
 		layout = self.layout
 		layout.operator("spl.add_pose", text="New")
 
-		spl = get_active_poselib(context)
-		book = get_active_book(spl)
+		spl = get_poselib_from_context(context)
+		book = spl.get_active_book()
 		if not book:
 			return
 		
-		pose = get_active_pose(book)
+		pose = book.get_active_pose()
 		if pose:
 			layout.operator("spl.replace_pose", text=f"Replace (Current)").pose_index = -1
 		if len(book.poses):
 			layout.menu("SPL_MT_ReplacePoseMenu", text="Replace...")
 
 
-from .props import get_active_poselib, get_active_book, get_active_pose
 
 # Submenu: Replace Pose
 class SPL_MT_ReplacePoseMenu(Menu):
@@ -34,14 +34,13 @@ class SPL_MT_ReplacePoseMenu(Menu):
 	def draw(self, context):
 		layout = self.layout
 
-		spl = get_active_poselib(context)
-		book = get_active_book(spl)
+		spl = get_poselib_from_context(context)
+		book = spl.get_active_book()
 		if not book:
 			return
 
 		for i, pose in enumerate(book.poses):
-			op = layout.operator("spl.replace_pose", text=pose.name)
-			op.pose_index = i
+			op = layout.operator("spl.replace_pose", text=pose.name).pose_index = i
 
 
 # Register

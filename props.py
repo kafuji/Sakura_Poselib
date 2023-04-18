@@ -2,6 +2,8 @@
 import bpy
 from bpy.types import PropertyGroup
 from bpy.props import *
+from mathutils import Vector, Matrix
+from typing import Optional
 
 from .internal import update_combined_pose
 
@@ -29,23 +31,22 @@ def resolve_naming_collision(self, collection):
 # callback for pose name change
 def posename_resolve_collision_callback(self, context):
 	arm = self.id_data
-	spl = arm.sakura_poselib
-	posebook = get_active_book(spl)
+	spl = get_poselib(arm)
+	posebook = spl.get_active_book()
 	resolve_naming_collision(self, posebook.poses)
 
-# callback for pose list name change
+# callback for pose book name change
 def posebookname_resolve_collision_callback(self, context):
+	print(self)
 	arm = self.id_data
-	spl = arm.sakura_poselib
-	spl.active_list_name = self.name
+	spl = get_poselib(arm)
 	resolve_naming_collision(self, spl.books)
-
 
 # callback for pose value change
 def update_pose_value(self, context):
 	arm = self.id_data
-	spl = arm.sakura_poselib
-	book = get_active_book(spl)
+	spl = get_poselib(arm)
+	book = spl.get_active_book()
 	update_combined_pose(book)
 
 
@@ -59,6 +60,12 @@ class BoneTransform(PropertyGroup):
 	location: FloatVectorProperty(name="Location", size=3, default=(0, 0, 0), subtype='TRANSLATION' )
 	rotation: FloatVectorProperty(name="Rotation", size=4, default=(1, 0, 0, 0), subtype='QUATERNION') # Quartanion
 	scale: FloatVectorProperty(name="Scale", size=3, default=(1, 1, 1), subtype='XYZ')
+
+	def copy_from(self, bone):
+		self.name = bone.name
+		self.location = bone.location
+		self.rotation = bone.rotation
+		self.scale = bone.scale
 
 # Data for each pose  
 class PoseData(PropertyGroup):
@@ -81,19 +88,73 @@ class PoseData(PropertyGroup):
 	bones: CollectionProperty(type=BoneTransform)
 	active_bone_index: IntProperty()
 
+	def get_active_bone(self) -> Optional[BoneTransform]:
+		if self.active_bone_index < 0 or self.active_bone_index >= len(self.bones):
+			return None
+		return self.bones[self.active_bone_index]
+
+	def add_bone(self) -> BoneTransform:
+		bone = self.bones.add()
+		self.active_bone_index = len(self.bones) - 1
+		return bone
+
+	def copy_from(self, pose: "PoseData"):
+		self.name = pose.name
+		self.category = pose.category
+		self.value = pose.value
+
+		self.bones.clear()
+		for bone in pose.bones:
+			new_bone = self.add_bone()
+			new_bone.copy_from(bone)
+
 # PoseBook (Collection of Poses)
 class PoseBook(PropertyGroup):
 	name: StringProperty(name="Book Name", default="New Book", update=posebookname_resolve_collision_callback)
 	poses: CollectionProperty(type=PoseData)
 	active_pose_index: IntProperty()
 
+	def get_active_pose(self) -> Optional[PoseData]:
+		if self.active_pose_index < 0 or self.active_pose_index >= len(self.poses):
+			return None
+		return self.poses[self.active_pose_index]
+
+	def get_pose_by_name(self, name) -> Optional[PoseData]:
+		for pose in self.poses:
+			if pose.name == name:
+				return pose
+		return None
+
+	def add_pose(self, name:str = None) -> PoseData:
+		pose = self.poses.add()
+		if name:
+			pose.name = name
+		self.active_pose_index = len(self.poses) - 1
+		return pose
+	
+	def remove_pose_by_index(self, index):
+		if index < 0 or index >= len(self.poses):
+			return
+
+		self.poses.remove(index)
+		if index >= self.active_pose_index:
+			self.active_pose_index -= 1
+		if self.active_pose_index < 0:
+			self.active_pose_index = 0
+
+	def remove_pose(self, pose: PoseData):
+		index = self.poses.find(pose.name)
+		if index >= 0:
+			self.remove_pose_by_index(index)
+
+
 # Root Container
 class PoselibData(PropertyGroup):
 	books: CollectionProperty(type=PoseBook) # PoseBooks
 	active_book_index: IntProperty()
 
-	# wrapper for adding new posebook, ensure creating backup bone names and set active book index
-	def add_book(self):
+	# add a new book
+	def add_book(self, name:str = None ) -> PoseBook:
 		if len(self.books) == 0:
 			# create bone name backups
 			arm = self.id_data
@@ -101,58 +162,62 @@ class PoselibData(PropertyGroup):
 				bone["spl_bone_name_backup"] = bone.name
 
 		book = self.books.add()
-		self.active_book_index = len(self.books) - 1
+		if not name:
+			name = 'New Book'
+		
+		# resolve naming collision
 
+		self.active_book_index = len(self.books) - 1
 		return book
+
+	# remove book by index
+	def remove_book_by_index(self, index):
+		if index < 0 or index >= len(self.books):
+			return
+
+		self.books.remove(index)
+		if index >= self.active_book_index:
+			self.active_book_index -= 1
+		if self.active_book_index < 0:
+			self.active_book_index = 0
+
+	# remove book
+	def remove_book(self, book: PoseBook):
+		index = self.books.find(book.name)
+		if index >= 0:
+			self.remove_book_by_index(index)
+
+	# get active book
+	def get_active_book(self) -> Optional[PoseBook]:
+		if self.active_book_index < 0 or self.active_book_index >= len(self.books):
+			return None
+		return self.books[self.active_book_index]
+
+	# get book by name
+	def get_book_by_name(self, name) -> Optional[PoseBook]:
+		for book in self.books:
+			if book.name == name:
+				return book
+		return None
 
 
 ###################################################
 # Helpers for user of this module
 ###################################################
 
-# Get Root Property from Object
-def get_poselib( obj: bpy.types.Object ) -> PoselibData:
-	if not obj or obj.type != 'ARMATURE':
+# Get Root PropertyGroup from Context
+def get_poselib_from_context( context: bpy.types.Context ) -> Optional[PoselibData]:
+	obj = context.object
+	if not obj or not obj.pose:
 		return None
+
 	return obj.sakura_poselib
 
-# Get Root Property from Context
-def get_active_poselib( context: bpy.types.Context ) -> PoselibData:
-	armature = context.object
-	if not armature or armature.type != 'ARMATURE':
+# Get Root PropertyGroup from Object
+def get_poselib( obj: bpy.types.Object ) -> Optional[PoselibData]:
+	if not obj or not obj.pose:
 		return None
-
-	return armature.sakura_poselib
-
-# Get Active Category
-def get_active_book( spl: PoselibData ) -> PoseBook:
-	if not spl.books:
-		return None
-
-	if spl.active_book_index < 0 or spl.active_book_index >= len(spl.books):
-		return None
-	
-	return spl.books[spl.active_book_index]
-
-
-# Get Active Pose
-def get_active_pose( posebook: PoseBook ) -> PoseData:
-	if posebook is None:
-		return None
-	if posebook.active_pose_index < 0 or posebook.active_pose_index >= len(posebook.poses):
-		return None
-
-	return posebook.poses[posebook.active_pose_index]
-
-
-# Get Active Bone
-def get_active_bone( pose: PoseData ) -> BoneTransform:
-	if pose is None:
-		return None
-	if pose.active_bone_index < 0 or pose.active_bone_index >= len(pose.bones):
-		return None
-	
-	return pose.bones[pose.active_bone_index]
+	return obj.sakura_poselib
 
 
 class PoseLibPlusScreen(PropertyGroup):

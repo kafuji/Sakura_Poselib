@@ -70,7 +70,6 @@ def extract_pose_library_data( armature: bpy.types.Object ):
 			for kf in fc.keyframe_points:
 				if kf.co[0] == marker.frame:
 					keyframes[fc.data_path + str(fc.array_index)] = kf.co[1]
-					
 
 		#print(marker.name, marker.frame)
 		#for key, value in keyframes.items():

@@ -4,7 +4,8 @@ import bpy
 from bpy.types import Panel
 from bpy.types import UIList
 
-from .props import get_active_poselib, get_active_book
+from .props import get_poselib_from_context
+from .poll_requirements import *
 
 # UIList for displaying the poses categories in Sakura Poselib
 class SPL_UL_PoseCategoryList(UIList):
@@ -20,12 +21,13 @@ class SPL_UL_PoseBook(UIList):
 	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 		l:bpy.types.UILayout = layout
 
-		row = l.row(align=True)
-		sp = row.split(factor=0.2, align=True)
+		col = l.column(align=True)
+		sp = col.split(factor=0.2, align=True)
 		sp.prop( item, 'category', text='', emboss=False)
 		sp.prop( item, 'name', text='', emboss=False )
 		sp.prop( item, 'value', slider=True, text='' )
-
+		col = l.column(align=True)
+		col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
 
 	def filter_items(self, context: bpy.types.Context, data: bpy.types.AnyType, property: str):
 		# filter items by category
@@ -86,13 +88,14 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 
 	# Only show the panel when an armature object is selected
 	@classmethod
+	@requires_active_armature
 	def poll(cls, context):
-		return context.object and context.object.type == 'ARMATURE'
+		return True
 
 	def draw(self, context):
 		l = self.layout
-		spl = get_active_poselib(context)
-		book = get_active_book(spl)
+		spl = get_poselib_from_context(context)
+		book = spl.get_active_book()
 
 		# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
 		l.label(text="PoseBooks:", icon='PRESET')
@@ -106,19 +109,13 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 		row.operator( 'spl.move_book', text='', icon='TRIA_UP').direction = 'UP'
 		row.operator( 'spl.move_book', text='', icon='TRIA_DOWN').direction = 'DOWN'
 
-		# Save / Load buttons
-		box = l.box().column(align=True)
-		box.label(text="Save / Load", icon='FILE')
+		# PoseBook Util buttons
+		l.label(text="Utilities", icon='PREFERENCES')
+		row = l.row(align=False)
+		row.operator( 'spl.auto_set_pose_category', icon='PRESET')
+		row.operator( 'spl.clean_poses', icon='TRASH')
+		l.operator("spl.batch_rename_bones", icon='PRESET')
 
-		row = box.row(align=True)
-		op = row.operator("spl.load_from_json", icon='FILE_FOLDER')
-		op = row.operator("spl.save_to_json", icon='CURRENT_FILE')
-
-		row = box.row(align=True)
-		op = row.operator("spl.load_from_csv", icon='FILE_FOLDER')
-		op = row.operator("spl.save_to_csv", icon='CURRENT_FILE')
-
-		l.separator()
 
 		# Draw the pose list as a UIList, and add buttons for pose operations
 		if book:
@@ -148,6 +145,8 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 			col.operator("spl.move_pose", text="", icon='TRIA_UP_BAR').direction = 'TOP'
 			col.operator("spl.move_pose", text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
 
+			col.separator()
+			col.operator("spl.move_pose_to_posebook", text="", icon='FILE_PARENT')
 
 			col.separator()
 			col.operator("spl.reset_book", text="", icon='X')
@@ -157,13 +156,6 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 			row = col.row(align=False)
 			row.operator( 'spl.apply_pose', icon='VIEWZOOM').pose_index = -1 # apply single pose
 			row.operator( 'spl.replace_pose', icon='GREASEPENCIL').pose_index = -1 # replace pose data with current pose
-
-			# Util buttons
-			col = l.box().column(align=True)
-			col.label(text="Utilities", icon='PREFERENCES')
-			row = col.row(align=False)
-			row.operator( 'spl.auto_set_pose_category', icon='PRESET')
-			row.operator( 'spl.clean_poses', icon='TRASH')
 
 
 		else:
@@ -182,23 +174,15 @@ class SPL_PT_PoseBoneData(Panel):
 	bl_options = {'DEFAULT_CLOSED'}
 
 	@classmethod
+	@requires_poses
 	def poll(cls, context):
-		obj = context.object
-		if not obj or not obj.pose:
-			return False
-	
-		spl = get_active_poselib(context)
-		book = get_active_book(spl)
-		if not book or not book.poses:
-			return False
-		
 		return True
 
 	def draw(self, context):
 		l = self.layout
 
-		spl = get_active_poselib(context)
-		book = get_active_book(spl)
+		spl = get_poselib_from_context(context)
+		book = spl.get_active_book()
 		poses = book.poses
 		pose_index = book.active_pose_index
 
@@ -207,11 +191,10 @@ class SPL_PT_PoseBoneData(Panel):
 		if not pose:
 			l.label(text="No active pose.", icon='INFO')
 		else:
-			box = l.box()
-			row = box.row()
+			row = l.row()
 			row.prop(book, 'name', icon='OUTLINER_OB_ARMATURE')
 			row.prop(pose, 'name', icon='ARMATURE_DATA')
-			col = box.column()
+			col = l.column()
 			# Bone List from active pose
 			col.label(text='Bones:', icon='BONE_DATA')
 			row = col.row()
@@ -224,7 +207,7 @@ class SPL_PT_PoseBoneData(Panel):
 			# show transforms for selected bone
 			bone = pose.bones[pose.active_bone_index] if len(pose.bones) > pose.active_bone_index else None
 			if bone:
-				col = box.column()
+				col = l.column()
 				col.label(text=f'Transforms: {bone.name}')
 				col.row().prop(bone, 'location')
 				col.row().prop(bone, 'rotation')
@@ -242,21 +225,28 @@ class SPL_PT_PoseBookConverter(Panel):
 
 	def draw(self, context):
 		l = self.layout
+
 		l.label(text="Import/Export", icon='IMPORT')
-		row = l.row(align=True)
+		row = l.row()
 		row.operator("spl.load_from_poselibrary", icon='IMPORT')
 		row.operator("spl.convert_to_poselibrary", icon='EXPORT')
-
-		l.separator()
-
-		row = l.row(align=True)
+		row = l.row()
 		row.operator("spl.load_from_mmdtools", icon='IMPORT')
 		row.operator("spl.send_to_mmdtools", icon='EXPORT')
 
 		l.separator()
-		l.label(text="Batch Operations", icon='PRESET')
-		l.operator("spl.batch_rename_bones", icon='PRESET')
 
+		# Save / Load buttons
+		l.label(text="Save / Load", icon='FILE')
+
+		row = l.row()
+		row.operator("spl.load_from_json", icon='FILE_FOLDER')
+		row.operator("spl.save_to_json", icon='CURRENT_FILE')
+		row = l.row()
+		row.operator("spl.load_from_csv", icon='FILE_FOLDER')
+		row.operator("spl.save_to_csv", icon='CURRENT_FILE')
+
+		l.separator()
 		return
 
 
