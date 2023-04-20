@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Panel
 from bpy.types import UIList
 
-from .props import get_poselib_from_context
+from .props import get_poselib, get_poselib_from_context
 from .poll_requirements import *
 
 # UIList for displaying the poses categories in Sakura Poselib
@@ -77,10 +77,94 @@ class SPL_UL_BoneList(UIList):
 		row.operator( 'spl.remove_bone_from_pose', text='', icon='REMOVE').bone_index = index
 
 
+# Panel drawer for Property Panel and 3D View Side Panel
+def draw_main_panel(self, context):
+	obj = context.object
+	if obj.pose:
+		arm = obj
+	else:
+		arm = obj.find_armature()
+	
+	if not arm:
+		l.label(text="No model selected.", icon='INFO')
+		return
+
+	l = self.layout
+	spl = get_poselib(arm)
+	book = spl.get_active_book()
+
+	# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
+	l.label(text="PoseBooks:", icon='PRESET')
+	row = l.row( align=False )
+	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=4)
+	#row.prop_search(spl, "active_list_name", spl, "books", text="")
+	row = row.column(align=True)
+	row.operator( 'spl.add_book', text='', icon='ADD')
+	row.operator( 'spl.remove_book', text='', icon='REMOVE')
+	row.separator()
+	row.operator( 'spl.move_book', text='', icon='TRIA_UP').direction = 'UP'
+	row.operator( 'spl.move_book', text='', icon='TRIA_DOWN').direction = 'DOWN'
+
+	# PoseBook Util buttons
+	l.label(text="Utilities", icon='PREFERENCES')
+	row = l.row(align=False)
+	row.operator( 'spl.auto_set_pose_category', icon='PRESET')
+	row.operator( 'spl.clean_poses', icon='TRASH')
+	l.operator("spl.batch_rename_bones", icon='PRESET')
+
+
+	# Draw the pose list as a UIList, and add buttons for pose operations
+	if book:
+		row = l.row(align=True)
+		row.alignment = 'LEFT'
+		row.label( text=book.name, translate=False, icon='POSE_HLT' )
+		row.label(text="Poses:")
+
+		row = l.row()
+		row.prop(bpy.context.screen.sakura_poselib, 'category_filter', expand=True)
+		
+		row = l.row()
+		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=8)
+
+		col = row.column(align=True)
+		col.operator("spl.add_pose", text="", icon='ADD')
+		col.operator("spl.remove_pose", text="", icon='REMOVE')
+
+		col.separator()
+
+		# Up/Down buttons for moving poses in the list
+		col.operator("spl.move_pose", text="", icon='TRIA_UP').direction = 'UP'
+		col.operator("spl.move_pose", text="", icon='TRIA_DOWN').direction = 'DOWN'
+
+		# Top and Bottom buttons for moving poses to the top or bottom of the list
+		col.separator()
+		col.operator("spl.move_pose", text="", icon='TRIA_UP_BAR').direction = 'TOP'
+		col.operator("spl.move_pose", text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
+
+		col.separator()
+		col.operator("spl.move_pose_to_posebook", text="", icon='FILE_PARENT')
+
+		col.separator()
+		col.operator("spl.reset_book", text="", icon='X')
+
+		# Rest poses in the book button
+		col = l.column(align=True)
+		row = col.row(align=False)
+		row.operator( 'spl.apply_pose', icon='VIEWZOOM').pose_index = -1 # apply single pose
+		row.operator( 'spl.replace_pose', icon='GREASEPENCIL').pose_index = -1 # replace pose data with current pose
+
+
+	else:
+		l.label(text="No active PoseBook.", icon='INFO')
+		l.operator( 'spl.add_book', text='Add Pose List', icon='ADD')
+
+
+
+
 # Panel to display Sakura Poselib functionality in the properties panel
-class SPL_PT_PoseLibraryPlusPanel(Panel):
+class SPL_PT_PoseLibPropPanel(Panel):
 	bl_label = "Sakura Poselib"
-	bl_idname = "SPL_PT_PoseLibraryPlusPanel"
+	bl_idname = "SPL_PT_PoseLibPropPanel"
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
 	bl_context = "data"
@@ -93,81 +177,31 @@ class SPL_PT_PoseLibraryPlusPanel(Panel):
 		return True
 
 	def draw(self, context):
-		l = self.layout
-		spl = get_poselib_from_context(context)
-		book = spl.get_active_book()
-
-		# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
-		l.label(text="PoseBooks:", icon='PRESET')
-		row = l.row( align=False )
-		row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=4)
-		#row.prop_search(spl, "active_list_name", spl, "books", text="")
-		row = row.column(align=True)
-		row.operator( 'spl.add_book', text='', icon='ADD')
-		row.operator( 'spl.remove_book', text='', icon='REMOVE')
-		row.separator()
-		row.operator( 'spl.move_book', text='', icon='TRIA_UP').direction = 'UP'
-		row.operator( 'spl.move_book', text='', icon='TRIA_DOWN').direction = 'DOWN'
-
-		# PoseBook Util buttons
-		l.label(text="Utilities", icon='PREFERENCES')
-		row = l.row(align=False)
-		row.operator( 'spl.auto_set_pose_category', icon='PRESET')
-		row.operator( 'spl.clean_poses', icon='TRASH')
-		l.operator("spl.batch_rename_bones", icon='PRESET')
+		draw_main_panel(self, context)
 
 
-		# Draw the pose list as a UIList, and add buttons for pose operations
-		if book:
-			row = l.row(align=True)
-			row.alignment = 'LEFT'
-			row.label( text=book.name, translate=False, icon='POSE_HLT' )
-			row.label(text="Poses:")
+# Panel to display Sakura Poselib in the 3D View Side Panel
+class SPL_PT_PoseLibrarySidePanel(Panel):
+	bl_label = "Sakura Poselib"
+	bl_idname = "SPL_PT_PoseLibSidePanel"
+	bl_space_type = 'VIEW_3D'
+	bl_region_type = 'UI'
+	bl_category = "Sakura"
 
-			row = l.row()
-			row.prop(bpy.context.screen.sakura_poselib, 'category_filter', expand=True)
-			
-			row = l.row()
-			row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=8)
+	# Only show the panel when an armature object is selected
+	@classmethod
+	def poll(cls, context):
+		return context.object
 
-			col = row.column(align=True)
-			col.operator("spl.add_pose", text="", icon='ADD')
-			col.operator("spl.remove_pose", text="", icon='REMOVE')
-
-			col.separator()
-
-			# Up/Down buttons for moving poses in the list
-			col.operator("spl.move_pose", text="", icon='TRIA_UP').direction = 'UP'
-			col.operator("spl.move_pose", text="", icon='TRIA_DOWN').direction = 'DOWN'
-
-			# Top and Bottom buttons for moving poses to the top or bottom of the list
-			col.separator()
-			col.operator("spl.move_pose", text="", icon='TRIA_UP_BAR').direction = 'TOP'
-			col.operator("spl.move_pose", text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
-
-			col.separator()
-			col.operator("spl.move_pose_to_posebook", text="", icon='FILE_PARENT')
-
-			col.separator()
-			col.operator("spl.reset_book", text="", icon='X')
-
-			# Rest poses in the book button
-			col = l.column(align=True)
-			row = col.row(align=False)
-			row.operator( 'spl.apply_pose', icon='VIEWZOOM').pose_index = -1 # apply single pose
-			row.operator( 'spl.replace_pose', icon='GREASEPENCIL').pose_index = -1 # replace pose data with current pose
-
-
-		else:
-			l.label(text="No active PoseBook.", icon='INFO')
-			l.operator( 'spl.add_book', text='Add Pose List', icon='ADD')
+	def draw(self, context):
+		draw_main_panel(self, context)
 
 
 # Panel to display Sakura Poselib functionality in the properties panel
 class SPL_PT_PoseBoneData(Panel):
 	bl_label = "Pose Bone Data"
 	bl_idname = "SPL_PT_PoseBoneData"
-	bl_parent_id = "SPL_PT_PoseLibraryPlusPanel"
+	bl_parent_id = "SPL_PT_PoseLibPropPanel"
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
 	bl_context = "data"
@@ -180,7 +214,6 @@ class SPL_PT_PoseBoneData(Panel):
 
 	def draw(self, context):
 		l = self.layout
-
 		spl = get_poselib_from_context(context)
 		book = spl.get_active_book()
 		poses = book.poses
@@ -217,7 +250,7 @@ class SPL_PT_PoseBoneData(Panel):
 class SPL_PT_PoseBookConverter(Panel):
 	bl_label = "Converter"
 	bl_idname = "SPL_PT_PoseBookConverter"
-	bl_parent_id = "SPL_PT_PoseLibraryPlusPanel"
+	bl_parent_id = "SPL_PT_PoseLibPropPanel"
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
 	bl_context = "data"
@@ -255,7 +288,8 @@ _classes = [
 	SPL_UL_PoseCategoryList,
 	SPL_UL_PoseBook,
 	SPL_UL_BoneList,
-	SPL_PT_PoseLibraryPlusPanel,
+	SPL_PT_PoseLibPropPanel,
+	SPL_PT_PoseLibrarySidePanel,
 	SPL_PT_PoseBoneData,
 	SPL_PT_PoseBookConverter,
 ]

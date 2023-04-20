@@ -93,8 +93,9 @@ class PoseData(PropertyGroup):
 			return None
 		return self.bones[self.active_bone_index]
 
-	def add_bone(self) -> BoneTransform:
+	def add_bone(self, name:str) -> BoneTransform:
 		bone = self.bones.add()
+		bone.name = name
 		self.active_bone_index = len(self.bones) - 1
 		return bone
 

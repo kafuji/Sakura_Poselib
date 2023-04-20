@@ -1,8 +1,6 @@
 Category	English	Japanese
 # Translate table for Sakura Poselib
 
-*	Sakura Poselib	サクラ ポーズライブラリ
-
 O	Load from Pose Library	ポーズライブラリから読み込み
 *	Load the active Pose Library to PoseBook	アクティブなポーズライブラリをポーズブックに読み込みます
 

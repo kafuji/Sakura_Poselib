@@ -17,10 +17,10 @@ class SPL_MT_PoseMenu(Menu):
 		book = spl.get_active_book()
 		if not book:
 			return
-		
+
 		pose = book.get_active_pose()
 		if pose:
-			layout.operator("spl.replace_pose", text=f"Replace (Current)").pose_index = -1
+			layout.operator("spl.replace_pose", text=f"Replace '{pose.name}'").pose_index = -1
 		if len(book.poses):
 			layout.menu("SPL_MT_ReplacePoseMenu", text="Replace...")
 
