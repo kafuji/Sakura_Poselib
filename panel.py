@@ -79,6 +79,8 @@ class SPL_UL_BoneList(UIList):
 
 # Panel drawer for Property Panel and 3D View Side Panel
 def draw_main_panel(self, context):
+	l = self.layout
+
 	obj = context.object
 	if obj.pose:
 		arm = obj
@@ -89,7 +91,6 @@ def draw_main_panel(self, context):
 		l.label(text="No model selected.", icon='INFO')
 		return
 
-	l = self.layout
 	spl = get_poselib(arm)
 	book = spl.get_active_book()
 
