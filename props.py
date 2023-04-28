@@ -209,16 +209,24 @@ class PoselibData(PropertyGroup):
 # Get Root PropertyGroup from Context
 def get_poselib_from_context( context: bpy.types.Context ) -> Optional[PoselibData]:
 	obj = context.object
-	if not obj or not obj.pose:
+	if not obj:
+		return None
+	arm = obj if obj.pose else obj.find_armature()
+	if not arm:
 		return None
 
-	return obj.sakura_poselib
+	return arm.sakura_poselib
 
 # Get Root PropertyGroup from Object
 def get_poselib( obj: bpy.types.Object ) -> Optional[PoselibData]:
-	if not obj or not obj.pose:
+	if not obj:
 		return None
-	return obj.sakura_poselib
+
+	arm = obj if obj.pose else obj.find_armature()
+	if not arm:
+		return None
+
+	return arm.sakura_poselib
 
 
 class PoseLibPlusScreen(PropertyGroup):

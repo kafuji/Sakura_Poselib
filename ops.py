@@ -848,6 +848,11 @@ class SPL_OT_ResetPoseBook( bpy.types.Operator ):
     bl_description = "Reset all pose values to zero in the PoseBook"
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
+    @requires_active_posebook
+    def poll(cls, context):
+        return True
+   
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
