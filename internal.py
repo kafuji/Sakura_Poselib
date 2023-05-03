@@ -558,13 +558,18 @@ def apply_pose( pose_data, influence = 1.0, reset_others = False, additive = Fal
 	zero_rot = Quaternion((1.0,0.0,0.0,0.0))
 	zero_sca = Vector((1.0,1.0,1.0))
 
+	# Backup rotation modes
+	rot_modes = {}
+	for bone in arm.pose.bones:
+		rot_modes[bone] = bone.rotation_mode
+		bone.rotation_mode = 'QUATERNION'
+
 	# Reset other bones
 	if reset_others:
 		for bone in arm.pose.bones:
 			bone.location = zero_loc
 			bone.rotation_quaternion = zero_rot
 			bone.scale = zero_sca
-
 
 	for bone_data in pose_data.bones:
 		bone = arm.pose.bones.get(bone_data.name)
@@ -586,6 +591,9 @@ def apply_pose( pose_data, influence = 1.0, reset_others = False, additive = Fal
 			bone.location = bone.location + loc_diff
 			bone.rotation_quaternion = bone.rotation_quaternion.slerp( bone_data.rotation, influence )
 			bone.scale = bone.scale + sca_diff
+
+		# restore rotation mode
+		bone.rotation_mode = rot_modes[bone]
 
 	return
 
@@ -629,8 +637,11 @@ def update_combined_pose( book ):
 	for bone_name, (loc, rot, sca) in accum_dic.items():
 		pbone = arm.pose.bones.get(bone_name)
 		if pbone:
+			org_rotation_mode = pbone.rotation_mode
+			pbone.rotation_mode = 'QUATERNION'
 			pbone.location = loc
 			pbone.rotation_quaternion = rot.to_quaternion()
 			pbone.scale = sca
+			pbone.rotation_mode = org_rotation_mode
 
 	return
