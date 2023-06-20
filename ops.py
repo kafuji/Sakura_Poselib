@@ -291,8 +291,7 @@ class SPL_OT_RemovePoseBook( bpy.types.Operator ):
     # Execute the operator
     def execute(self, context):
         spl = get_poselib_from_context(context)
-        book = spl.get_active_book()
-        spl.remove_book(book)
+        spl.remove_active_book()
 
         return {'FINISHED'}
 

@@ -64,8 +64,11 @@ def extract_pose_library_data( armature: bpy.types.Object ):
 		keyframes = {} # data_path : value
 
 		for fc in pose_library.fcurves:
-			if not fc.data_path.startswith("pose.bones"):
-				continue
+			try:
+				if not fc.data_path.startswith("pose.bones"):
+					continue
+			except UnicodeDecodeError: # in case of invalid datapath or something
+				continue # just skip
 
 			for kf in fc.keyframe_points:
 				if kf.co[0] == marker.frame:

@@ -182,6 +182,12 @@ class PoselibData(PropertyGroup):
 		if self.active_book_index < 0:
 			self.active_book_index = 0
 
+	# remove active book
+	def remove_active_book(self):
+		if self.active_book_index < 0 or self.active_book_index >= len(self.books):
+			return
+		self.remove_book_by_index(self.active_book_index)
+
 	# remove book
 	def remove_book(self, book: PoseBook):
 		index = self.books.find(book.name)
