@@ -192,6 +192,17 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
         max=100.0,
     )
 
+    use_mmd_bone_names: BoolProperty(
+        name="Use MMD Bone Names",
+        description="Use MMD bone names (mmd_tools:mmd_bone.name) instead of Blender bone names",
+        default=True,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "scale")
+        layout.prop(self, "use_mmd_bone_names")
+
     @classmethod
     @requires_poses
     def poll(cls, context):
@@ -212,7 +223,7 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
         book = spl.get_active_book()
 
         # Save poses to file
-        internal.save_book_to_csv(book, self.filepath, self.scale )
+        internal.save_book_to_csv(book, self.filepath, self.scale, self.use_mmd_bone_names )
 
         return {'FINISHED'}
 
@@ -414,7 +425,6 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
 
         # Replace (Overwrite) selected pose
         target_pose = book.poses[pose_index]
-        target_pose.bones.clear()
 
         # Save only bones contributing to the deformation
         for bone in arm.pose.bones:
@@ -423,7 +433,7 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
                     continue
 
             if bone.matrix_basis != Matrix.Identity(4):
-                bd = target_pose.add_bone(bone.name)
+                bd = target_pose.get_bone_by_name(bone.name) or target_pose.add_bone(bone.name)
                 bd.location = bone.location
                 bd.rotation = internal.get_pose_bone_rotation_quaternion(bone)
                 bd.scale = bone.scale
@@ -729,6 +739,7 @@ class SPL_OT_RemoveBoneFromPose( bpy.types.Operator ):
         # Remove the bone from the pose
         if self.bone_index >= 0 and self.bone_index < len(pose.bones):
             pose.bones.remove(self.bone_index)
+            pose.active_bone_index = max( 0, min(pose.active_bone_index, len(pose.bones)-1) )
         else:
             self.report({'WARNING'}, "Bone not found")
             return {'CANCELLED'}

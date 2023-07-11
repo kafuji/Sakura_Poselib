@@ -99,6 +99,12 @@ class PoseData(PropertyGroup):
 		self.active_bone_index = len(self.bones) - 1
 		return bone
 
+	def get_bone_by_name(self, name:str) -> Optional[BoneTransform]:
+		for bone in self.bones:
+			if bone.name == name:
+				return bone
+		return None
+
 	def copy_from(self, pose: "PoseData"):
 		self.name = pose.name
 		self.category = pose.category
@@ -114,6 +120,20 @@ class PoseBook(PropertyGroup):
 	name: StringProperty(name="Book Name", default="New Book", update=posebookname_resolve_collision_callback)
 	poses: CollectionProperty(type=PoseData)
 	active_pose_index: IntProperty()
+
+	category_filter: EnumProperty(
+		name="Category", 
+		items=[
+			("ALL", "All", "Show All"), 
+			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
+			("EYE", "Eye", "Show Eye Poses"),
+			("MOUTH", "Mouth", "Show Mouth Poses"), 
+			("OTHER", "Other", "Show Other Poses (Body, FX, etc)"),
+			], 
+		default="ALL",
+		options=set(), 
+	)
+
 
 	def get_active_pose(self) -> Optional[PoseData]:
 		if self.active_pose_index < 0 or self.active_pose_index >= len(self.poses):
@@ -153,7 +173,6 @@ class PoseBook(PropertyGroup):
 class PoselibData(PropertyGroup):
 	books: CollectionProperty(type=PoseBook) # PoseBooks
 	active_book_index: IntProperty()
-
 	# add a new book
 	def add_book(self, name:str = None ) -> PoseBook:
 		if len(self.books) == 0:
@@ -235,20 +254,6 @@ def get_poselib( obj: bpy.types.Object ) -> Optional[PoselibData]:
 	return arm.sakura_poselib
 
 
-class PoseLibPlusScreen(PropertyGroup):
-	category_filter: EnumProperty(
-		name="Category", 
-		items=[
-			("ALL", "All", "Show All"), 
-			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
-			("EYE", "Eye", "Show Eye Poses"),
-			("MOUTH", "Mouth", "Show Mouth Poses"), 
-			("OTHER", "Other", "Show Other Poses (Body, FX, etc)"),
-			], 
-		default="ALL",
-		options=set(), 
-	)
-
 
 ###################################################
 # Register & Unregister (called from __init__.py)
@@ -259,18 +264,15 @@ classes = (
 	PoseData,
 	PoseBook,
 	PoselibData,
-	PoseLibPlusScreen,
 )
 
 def register():
 	for cls in classes:
 		bpy.utils.register_class(cls)
 	bpy.types.Object.sakura_poselib = PointerProperty(type=PoselibData)
-	bpy.types.Screen.sakura_poselib = PointerProperty(type=PoseLibPlusScreen)
 
 def unregister():
 	for cls in classes:
 		bpy.utils.unregister_class(cls)
 	del bpy.types.Object.sakura_poselib
-	del bpy.types.Screen.sakura_poselib
 

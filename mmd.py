@@ -1,6 +1,7 @@
 # mmd_tools related functions
 
 import bpy
+from typing import Optional, Tuple
 
 # get mmd root object
 def get_model_root(obj: bpy.types.Object) -> bpy.types.Object:
@@ -16,9 +17,22 @@ def is_mmd_tools_installed():
 	return bpy.context.preferences.addons.get("mmd_tools")
 
 
+# Get mmd_bone.name and name_e
+def get_mmd_bone_name_j_e(bone: bpy.types.Bone) -> Tuple[str, str]:
+    if not bone:
+        raise ValueError("bone is None")
+    
+    if not is_mmd_tools_installed():
+        return bone.name, bone.name
+    
+    name_j, name_e = bone.mmd_bone.name_j or bone.name, bone.mmd_bone.name_e or bone.name
+
+    return name_j, name_e
+
+
+
 # Bone Converter
 # code from mmd_tools.core.vmd.importer.py
-
 from mathutils import Matrix, Quaternion, Vector
 
 class _InterpolationHelper:

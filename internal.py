@@ -361,7 +361,7 @@ _POSE_CATEGORIES = [
 
 
 # Save PoseBook into a file (CSV)
-def save_book_to_csv( book, filename, scale=12.5 ):
+def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True):
 	poses = book.poses
 	obj: bpy.types.Object = book.id_data
 	arm: bpy.types.Armature = obj.data
@@ -416,8 +416,13 @@ def save_book_to_csv( book, filename, scale=12.5 ):
 
 				pbone = obj.pose.bones.get(bone.name)
 				if pbone is None:
-					print(f'Warning: Bone "{bone.name}" not found in "{obj.name}", skippping...')
+					print(f'Warning: Bone "{bone.name}" in pose "{pose.name}" not found in "{obj.name}", skippping...')
 					continue
+
+				if use_mmd_bone_names:
+					bone_name_j, _ = mmd.get_mmd_bone_name_j_e(pbone)
+				else:
+					bone_name_j = pbone.name
 
 				# use bone converter from mmd_tools to convert bone location and rotation to MMD unit
 				converter = _get_converter(pbone) 
@@ -425,7 +430,7 @@ def save_book_to_csv( book, filename, scale=12.5 ):
 				rw, rx, ry, rz = bone.rotation
 				rw, rx, ry, rz = converter.convert_rotation( [rx, ry, rz, rw] )
 				rot = mmd.quaternion_to_degrees( Quaternion((rw, rx, ry, rz)) )
-				bone_data = f'PmxBoneMorph,"{pose.name}",{index},"{bone.name}",{loc.x:.5g},{loc.y:.5g},{loc.z:.5g},{rot.x:.5g},{rot.y:.5g},{rot.z:.5g}\n'
+				bone_data = f'PmxBoneMorph,"{pose.name}",{index},"{bone_name_j}",{loc.x:.5g},{loc.y:.5g},{loc.z:.5g},{rot.x:.5g},{rot.y:.5g},{rot.z:.5g}\n'
 				csvfile.write(bone_data)
 
 		# Comment

@@ -31,7 +31,8 @@ class SPL_UL_PoseBook(UIList):
 
 	def filter_items(self, context: bpy.types.Context, data: bpy.types.AnyType, property: str):
 		# filter items by category
-		category_filter = context.screen.sakura_poselib.category_filter
+		# print(data, property)
+		category_filter = data.category_filter
 
 		items = getattr(data, property)
 
@@ -122,7 +123,7 @@ def draw_main_panel(self, context):
 		row.label(text="Poses:")
 
 		row = l.row()
-		row.prop(bpy.context.screen.sakura_poselib, 'category_filter', expand=True)
+		row.prop(book, 'category_filter', expand=True)
 		
 		row = l.row()
 		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=8)
