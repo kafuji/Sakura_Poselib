@@ -99,6 +99,14 @@ class PoseData(PropertyGroup):
 		self.active_bone_index = len(self.bones) - 1
 		return bone
 
+	def remove_bone(self, name:str):
+		for idx, bone in enumerate(self.bones):
+			if bone.name == name:
+				self.bones.remove(idx)
+				break
+		self.active_bone_index = max(0, min(self.active_bone_index, len(self.bones) - 1) )
+
+
 	def get_bone_by_name(self, name:str) -> Optional[BoneTransform]:
 		for bone in self.bones:
 			if bone.name == name:
@@ -145,6 +153,11 @@ class PoseBook(PropertyGroup):
 			if pose.name == name:
 				return pose
 		return None
+	
+	def get_pose_by_index(self, index) -> Optional[PoseData]:
+		if index < 0 or index >= len(self.poses):
+			return None
+		return self.poses[index]
 
 	def add_pose(self, name:str = None) -> PoseData:
 		pose = self.poses.add()

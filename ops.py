@@ -424,7 +424,7 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
             return {'CANCELLED'}
 
         # Replace (Overwrite) selected pose
-        target_pose = book.poses[pose_index]
+        target_pose = book.get_pose_by_index(pose_index)
 
         # Save only bones contributing to the deformation
         for bone in arm.pose.bones:
@@ -437,6 +437,11 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
                 bd.location = bone.location
                 bd.rotation = internal.get_pose_bone_rotation_quaternion(bone)
                 bd.scale = bone.scale
+            else: # Remove bone from pose if it is not affected by the pose
+                bd = target_pose.get_bone_by_name(bone.name)
+                if bd:
+                    target_pose.remove_bone(bd.name)
+
 
         return {'FINISHED'}
 
