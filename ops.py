@@ -63,6 +63,23 @@ class SPL_OT_SendToMMDTools( bpy.types.Operator ):
     bl_description = "Send active PoseBook to mmd_tools Bone Morphs"
     bl_options = {'REGISTER', 'UNDO'}
 
+
+    use_alt_pose_names: BoolProperty(
+        name="Use Alt Pose Names",
+        description="Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)",
+        default=False,
+    )
+
+    clear_exsisiting: BoolProperty(
+        name="Clear Existing",
+        description="Clear existing Bone Morphs before sending",
+        default=False,
+    )
+
+    # show options first
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
     @classmethod
     @requires_poses
     def poll(cls, context):
@@ -74,7 +91,7 @@ class SPL_OT_SendToMMDTools( bpy.types.Operator ):
         book = spl.get_active_book()
 
         # Convert the pose to mmd_tools Bone Morph
-        internal.convert_poses_to_mmdtools(book)
+        internal.convert_poses_to_mmdtools(book, self.use_alt_pose_names, self.clear_exsisiting)
 
         return {'FINISHED'}
 
@@ -198,10 +215,17 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
         default=True,
     )
 
+    use_alt_pose_names: BoolProperty(
+        name="Use Alt Pose Names",
+        description="Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)",
+        default=False,
+    )
+
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "scale")
         layout.prop(self, "use_mmd_bone_names")
+        layout.prop(self, "use_alt_pose_names")
 
     @classmethod
     @requires_poses
@@ -223,7 +247,7 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
         book = spl.get_active_book()
 
         # Save poses to file
-        internal.save_book_to_csv(book, self.filepath, self.scale, self.use_mmd_bone_names )
+        internal.save_book_to_csv(book, self.filepath, self.scale, self.use_mmd_bone_names, self.use_alt_pose_names )
 
         return {'FINISHED'}
 
@@ -364,9 +388,9 @@ class SPL_OT_AddPose( bpy.types.Operator ):
 
 
     def execute(self, context):
-        arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
+        arm = spl.id_data
 
         if not book: # Create new
             book = spl.add_book("New PoseBook")
@@ -411,9 +435,9 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
 
     def execute(self, context):
         # print("Replace Pose", self.pose_index)
-        arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
+        arm = spl.id_data
 
         # Get the target pose, if pose_index is negative, use the active pose
         pose_index = self.pose_index if self.pose_index >= 0 else book.active_pose_index

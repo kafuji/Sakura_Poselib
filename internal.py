@@ -232,7 +232,7 @@ def load_poses_from_mmdtools( book ):
 
 
 # Convert to MMD Tools' Bone Morph
-def convert_poses_to_mmdtools( book, clear_exsisting=False ):
+def convert_poses_to_mmdtools( book, use_alt_pose_names=False, clear_exsisting=False ):
 	armature = book.id_data
 	root = mmd.get_model_root( armature )
 	if not root:
@@ -245,11 +245,13 @@ def convert_poses_to_mmdtools( book, clear_exsisting=False ):
 		bone_morphs.clear()
 
 	for pose in poses:
+		pose_name = pose.name_alt if use_alt_pose_names and pose.name_alt else pose.name
+
 		# find by name
-		morph = bone_morphs.get( pose.name )
+		morph = bone_morphs.get( pose_name )
 		if not morph:
 			morph = bone_morphs.add()
-			morph.name = pose.name
+			morph.name = pose_name
 			morph.category = pose.category
 
 		# clear bone data
@@ -283,6 +285,7 @@ def save_book_to_json( book, filepath ):
 	for pose in poses:
 		pose_data = {
 			'name' : pose.name,
+			'name_alt' : pose.name_alt,
 			'category' : pose.category,
 			'bones' : [],
 		}
@@ -322,7 +325,7 @@ def guess_pose_category( pose_name ):
 
 
 # Load PoseBook from a file (JSON)
-def load_book_from_json( book, filepath, clear_exsisting=False ):
+def load_book_from_json( book, filepath ):
 	poses = book.poses
 
 	poses.clear()
@@ -335,6 +338,7 @@ def load_book_from_json( book, filepath, clear_exsisting=False ):
 	for pose_data in data:
 		pose = poses.add()
 		pose.name = pose_data.get('name')
+		pose.name_alt = pose_data.get('name_alt')
 		pose.category = pose_data.get('category', 'NONE')
 		if pose.category == 'NONE': # Guess
 			pose.category = guess_pose_category( pose.name )
@@ -345,8 +349,8 @@ def load_book_from_json( book, filepath, clear_exsisting=False ):
 			bd.location = bone_data.get('location')
 			bd.rotation = bone_data.get('rotation')
 
-	book.name = os.path.basename( filepath )
-
+	# remove path and extension from filename
+	book.name = os.path.splitext( os.path.basename(filepath) )[0]
 	return
 
 
@@ -361,7 +365,7 @@ _POSE_CATEGORIES = [
 
 
 # Save PoseBook into a file (CSV)
-def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True):
+def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
 	poses = book.poses
 	obj: bpy.types.Object = book.id_data
 	arm: bpy.types.Armature = obj.data
@@ -393,13 +397,14 @@ def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True):
 
 		# write data
 		for pose in poses:
+			pose_name = pose.name_alt if use_alt_names and pose.name_alt else pose.name
 			# Write a pose header
 			# format: f"PmxMorph,{pose.name},{pose.name},{category_index},2(BoneMorph)"
 			if pose.category not in _POSE_CATEGORIES:
 				category_index = 4
 			else:
 				category_index = _POSE_CATEGORIES.index(pose.category)
-			pose_header = f'PmxMorph,"{pose.name}","",{category_index},2\n'
+			pose_header = f'PmxMorph,"{pose_name}","",{category_index},2\n'
 			csvfile.write(pose_header)
 
 			# Write a bone list header
@@ -430,7 +435,7 @@ def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True):
 				rw, rx, ry, rz = bone.rotation
 				rw, rx, ry, rz = converter.convert_rotation( [rx, ry, rz, rw] )
 				rot = mmd.quaternion_to_degrees( Quaternion((rw, rx, ry, rz)) )
-				bone_data = f'PmxBoneMorph,"{pose.name}",{index},"{bone_name_j}",{loc.x:.5g},{loc.y:.5g},{loc.z:.5g},{rot.x:.5g},{rot.y:.5g},{rot.z:.5g}\n'
+				bone_data = f'PmxBoneMorph,"{pose_name}",{index},"{bone_name_j}",{loc.x:.5g},{loc.y:.5g},{loc.z:.5g},{rot.x:.5g},{rot.y:.5g},{rot.z:.5g}\n'
 				csvfile.write(bone_data)
 
 		# Comment

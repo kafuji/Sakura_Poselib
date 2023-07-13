@@ -25,6 +25,8 @@ class SPL_UL_PoseBook(UIList):
 		sp = col.split(factor=0.2, align=True)
 		sp.prop( item, 'category', text='', emboss=False)
 		sp.prop( item, 'name', text='', emboss=False )
+		if data.show_alt_pose_names:
+			sp.prop( item, 'name_alt', text='', emboss=True )
 		sp.prop( item, 'value', slider=True, text='' )
 		col = l.column(align=True)
 		col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
@@ -80,7 +82,7 @@ class SPL_UL_BoneList(UIList):
 
 # Panel drawer for Property Panel and 3D View Side Panel
 def draw_main_panel(self, context):
-	l = self.layout
+	l:bpy.types.UILayout = self.layout
 
 	obj = context.object
 	if obj.pose:
@@ -118,9 +120,14 @@ def draw_main_panel(self, context):
 	# Draw the pose list as a UIList, and add buttons for pose operations
 	if book:
 		row = l.row(align=True)
+		sp = l.split(factor=0.6, align=True)
+		row = sp.row(align=True)
 		row.alignment = 'LEFT'
-		row.label( text=book.name, translate=False, icon='POSE_HLT' )
+		row.label(text=book.name, translate=False, icon='POSE_HLT')
 		row.label(text="Poses:")
+		col = sp.column(align=True)
+		col.alignment = 'RIGHT'
+		col.prop(book, 'show_alt_pose_names', toggle=True, icon='TEXT')
 
 		row = l.row()
 		row.prop(book, 'category_filter', expand=True)

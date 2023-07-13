@@ -70,6 +70,11 @@ class BoneTransform(PropertyGroup):
 # Data for each pose  
 class PoseData(PropertyGroup):
 	name: StringProperty(name="Pose Name", default="New Pose", update=posename_resolve_collision_callback)
+	name_alt: StringProperty(
+		name="Pose Name (Alt)", 
+		description="Alternative name. Mainly intended for translation. Not used as idetifier in blender", 
+		default=""
+		)
 
 	category: EnumProperty(
 		name="Category", 
@@ -129,6 +134,7 @@ class PoseBook(PropertyGroup):
 	poses: CollectionProperty(type=PoseData)
 	active_pose_index: IntProperty()
 
+
 	category_filter: EnumProperty(
 		name="Category", 
 		items=[
@@ -141,6 +147,13 @@ class PoseBook(PropertyGroup):
 		default="ALL",
 		options=set(), 
 	)
+
+	show_alt_pose_names: BoolProperty(
+		name="Show Alt Names",
+		description="Show alternative pose names. Mainly intended for translation. Not used as idetifier in blender",
+		default=False, 
+		options=set()
+		)
 
 
 	def get_active_pose(self) -> Optional[PoseData]:

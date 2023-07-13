@@ -15,6 +15,9 @@ O	Load from mmd_tools	mmd_toolsから読み込み
 O	Send to mmd_tools	mmd_toolsに送る
 *	Send active PoseBook to mmd_tools Bone Morphs	アクティブなポーズブックをmmd_toolsボーンモーフに送ります
 
+*	Clear Existing	既存のものをクリア
+*	"Clear existing Bone Morphs before sending	送信前に既存のボーンモーフをクリアします
+
 
 O	Save to Json	Jsonファイルに書き出し
 *	Save active PoseBook to a Json file	アクティブなポーズブックをJsonファイルに書き出します
@@ -32,6 +35,8 @@ O	Save to CSV	CSVファイルに書き出し
 *	Scale factor (Blender -> MMD)	スケールファクター（Blender -> MMD）
 *	Use MMD Bone Names	MMDボーン名を使用
 *	Use MMD bone names (mmd_tools:mmd_bone.name) instead of Blender bone names	Blenderボーン名の代わりにMMDボーン名（mmd_tools:mmd_bone.name）を使用します
+*	Use Alt Pose Names	別名を使用
+*	Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	デフォルトのポーズ名の代わりに別名（PoseData.name_alt）を使用します。主に翻訳用です
 
 *	Replace (Current)	置き換え（現在のポーズ）
 *	Replace...	置き換え...
@@ -41,6 +46,7 @@ O	Save to CSV	CSVファイルに書き出し
 *	Pose Bone Data	ポーズのボーンデータ：
 *	Book Name	ブック名：
 
+
 *	No active pose.	アクティブなポーズがありません。
 
 O	Add PoseBook	ポーズブックを追加
@@ -48,6 +54,11 @@ O	Add PoseBook	ポーズブックを追加
 
 O	Remove PoseBook	ポーズブックを削除
 *	Remove active PoseBook	アクティブなポーズブックを削除します
+
+* 	Pose Name (Alt)	ポーズの別名
+* 	Alternative name. Mainly intended for translation. Not used as idetifier in blender	別名。主に翻訳用。Blenderでは識別子として使用されません
+*	Show Alt Names	別名を表示
+*	Show alternative pose names. Mainly intended for translation. Not used as idetifier in blender	別名を表示します。主に翻訳用。Blenderでは識別子として使用されません
 
 O	Select Pose Bones	ポーズボーンを選択
 *	Select bones used in the pose	ポーズに使用されているボーンを選択
