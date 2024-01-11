@@ -418,9 +418,9 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
     bl_idname = "spl.replace_pose"
     bl_label = "Replace"
     bl_description = "Replace the selected pose with the current armature pose (overwrite)"
-    bl_options = {'UNDO'}
+    bl_options = {'REGISTER', 'UNDO'}
 
-    pose_index: IntProperty(default=-1)
+    pose_index: IntProperty(default=-1, options={'HIDDEN'})
 
     only_visible_bones: BoolProperty(
         name="Only Visible Bones", 
@@ -623,9 +623,13 @@ class SPL_OT_SelectBonesInPose( bpy.types.Operator ):
             pbone.bone.hide = False
 
             # show armature layer if the bone is on it
-            for i in range(32):
-                if pbone.bone.layers[i]:
-                    arm.data.layers[i] = True
+            if bpy.app.version < (4,0,0): # 2.x~3.x
+                for i in range(32):
+                    if pbone.bone.layers[i]:
+                        arm.data.layers[i] = True
+            else: # 4.x~
+                for bcoll in pbone.bone.collections:
+                    bcoll.is_visible = True
 
         return {'FINISHED'}
 
@@ -638,24 +642,24 @@ def is_vector_almost_equal(v1, v2, threshold=1e-6):
     """Check if two vectors are almost equal"""
     return all(abs(x1 - x2) < threshold for x1, x2 in zip(v1, v2))
 
-def is_rotation_minimal(q, threshold=1e-6):
+def has_rotation(q, threshold=1e-6):
     """Check if the quaternion is less than minimal"""
     q_normalized = q.normalized()
     dot_product = q_normalized.dot(Quaternion())
     angle_diff = 2 * math.acos(min(1.0, abs(dot_product))) 
-    return angle_diff < threshold
+    return angle_diff > threshold
 
-def is_translation_minimal(v, threshold=1e-6):
-    """Check if the location vector is less than minimal"""
+def has_translation(v, threshold=1e-6):
+    """Check if the location vector has translation"""
     return any(abs(x) > threshold for x in v)
 
-def is_scale_minimal(v, threshold=1e-6):
+def has_scale(v, threshold=1e-6):
     """Check if the scale vector is less than minimal"""
-    return any(abs(x - 1) > threshold for x in v)
+    return any(abs(x-1.0) > threshold for x in v)
 
-def is_transform_minimal( loc, rot, scale, threshold=1e-6 ):
+def has_transform( loc, rot, scale, threshold=1e-6 ):
     """Check if the transform is less than minimal"""
-    return is_translation_minimal(loc, threshold) or is_rotation_minimal(rot, threshold) or is_scale_minimal(scale, threshold)
+    return has_translation(loc, threshold) or has_rotation(rot, threshold) or has_scale(scale, threshold)
 
 
 # Operator: Clean Poses (remove unused/invalid bones in poses within the active posebook)
@@ -731,7 +735,7 @@ class SPL_OT_CleanPoses( bpy.types.Operator ):
                         continue
                 if self.check_transform:
                     # Remove bones that are not contributing to the deformation
-                    if is_transform_minimal(bone.location, bone.rotation, bone.scale, self.threshold):
+                    if not has_transform(bone.location, bone.rotation, bone.scale, self.threshold):
                         bone_to_remove[bone.name] = "No deformation"
                         continue
 

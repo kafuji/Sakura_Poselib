@@ -29,7 +29,10 @@ class SPL_UL_PoseBook(UIList):
 			sp.prop( item, 'name_alt', text='', emboss=True )
 		sp.prop( item, 'value', slider=True, text='' )
 		col = l.column(align=True)
-		col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
+		row = col.row(align=True)
+		# row.operator( 'spl.apply_pose', text='', icon='VIEWZOOM').pose_index = index # apply single pose
+		row.operator( 'spl.replace_pose', text='', icon='GREASEPENCIL').pose_index = index # replace pose data with current pose
+		# col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
 
 	def filter_items(self, context: bpy.types.Context, data: bpy.types.AnyType, property: str):
 		# filter items by category

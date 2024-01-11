@@ -199,6 +199,7 @@ class PoseBook(PropertyGroup):
 class PoselibData(PropertyGroup):
 	books: CollectionProperty(type=PoseBook) # PoseBooks
 	active_book_index: IntProperty()
+
 	# add a new book
 	def add_book(self, name:str = None ) -> PoseBook:
 		if len(self.books) == 0:
