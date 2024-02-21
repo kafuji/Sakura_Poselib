@@ -218,7 +218,7 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
     use_alt_pose_names: BoolProperty(
         name="Use Alt Pose Names",
         description="Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)",
-        default=False,
+        default=True,
     )
 
     def draw(self, context):
@@ -337,7 +337,7 @@ class SPL_OT_ApplyPose( bpy.types.Operator ):
     bl_idname = "spl.apply_pose"
     bl_label = "Apply"
     bl_description = "Apply the selected pose to armature"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'UNDO'}
 
     pose_index: IntProperty(default=-1)
     influence: FloatProperty(
@@ -374,6 +374,14 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         description="Name of the new pose",
         default="New Pose",
     )
+
+    category: EnumProperty(
+        name="Category",
+        description="Category of the new pose",
+        items=internal.POSE_CATEGORIES,
+        default="ALL",
+    )
+    
 
     only_visible_bones: BoolProperty(
         name="Only Visible Bones", 
@@ -885,8 +893,8 @@ class SPL_OT_MovePoseBook( bpy.types.Operator ):
 
 
 # Operator: Reset all value of the poses in the PoseBook
-class SPL_OT_ResetPoseBook( bpy.types.Operator ):
-    bl_idname = "spl.reset_book"
+class SPL_OT_ResetPoseBookValues( bpy.types.Operator ):
+    bl_idname = "spl.reset_book_values"
     bl_label = "Reset PoseBook"
     bl_description = "Reset all pose values to zero in the PoseBook"
     bl_options = {'REGISTER', 'UNDO'}
@@ -895,7 +903,7 @@ class SPL_OT_ResetPoseBook( bpy.types.Operator ):
     @requires_active_posebook
     def poll(cls, context):
         return True
-   
+
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()

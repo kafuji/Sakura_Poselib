@@ -5,7 +5,7 @@ from bpy.props import *
 from mathutils import Vector, Matrix
 from typing import Optional
 
-from .internal import update_combined_pose
+from .internal import update_combined_pose, POSE_CATEGORIES
 
 ###################################################
 # Internal Functions
@@ -78,13 +78,7 @@ class PoseData(PropertyGroup):
 
 	category: EnumProperty(
 		name="Category", 
-		items=[
-			("NONE", "None", "Category is unset"), 
-			("EYEBROW", "Eyebrow", "Eyebrow"), 
-			("EYE", "Eye", "Eye"),
-			("MOUTH", "Mouth", "Mouth"), 
-			("OTHER", "Other", "Other (Body, FX, etc)"),
-			], 
+		items=POSE_CATEGORIES,
 		default="OTHER", 
 		options=set()
 	)
@@ -137,13 +131,7 @@ class PoseBook(PropertyGroup):
 
 	category_filter: EnumProperty(
 		name="Category", 
-		items=[
-			("ALL", "All", "Show All"), 
-			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
-			("EYE", "Eye", "Show Eye Poses"),
-			("MOUTH", "Mouth", "Show Mouth Poses"), 
-			("OTHER", "Other", "Show Other Poses (Body, FX, etc)"),
-			], 
+		items=POSE_CATEGORIES,
 		default="ALL",
 		options=set(), 
 	)

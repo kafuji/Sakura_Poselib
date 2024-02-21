@@ -8,6 +8,15 @@ from mathutils import Vector, Quaternion, Euler
 
 from . import mmd
 
+# pose categories definition
+POSE_CATEGORIES = [
+			("ALL", "All", "Show All"), 
+			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
+			("EYE", "Eye", "Show Eye Poses"),
+			("MOUTH", "Mouth", "Show Mouth Poses"), 
+			("OTHER", "Other", "Show Other Poses (Body, FX, etc)"),
+]
+
 
 # helper: check pose bone is visible
 def is_pose_bone_visible( pbone: bpy.types.PoseBone ) -> bool:

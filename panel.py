@@ -83,6 +83,41 @@ class SPL_UL_BoneList(UIList):
 		row.operator( 'spl.remove_bone_from_pose', text='', icon='REMOVE').bone_index = index
 
 
+# Submenu for PoseBook operations
+class SPL_MT_PoseBookMenu(bpy.types.Menu):
+	bl_label = "PoseBook Operations"
+	bl_idname = "SPL_MT_PoseBookMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator( 'spl.clean_poses', text='Clean Poses', icon='TRASH')
+		l.operator( 'spl.auto_set_pose_category', text='Auto Set Pose Category', icon='PRESET')
+		l.operator( 'spl.batch_rename_bones', text='Batch Rename Bones', icon='PRESET')
+		l.separator()
+		l.menu( 'SPL_MT_ConvertMenu', text='Convert', icon='EXPORT')
+
+# Submenu for export acitons
+class SPL_MT_ConvertMenu(bpy.types.Menu):
+	bl_label = "Convert"
+	bl_idname = "SPL_MT_ConvertMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.label(text="Import / Export", icon='IMPORT')
+		l.operator("spl.load_from_poselibrary", icon='IMPORT')
+		l.operator("spl.convert_to_poselibrary", icon='EXPORT')
+		l.separator()
+		l.operator("spl.load_from_mmdtools", icon='IMPORT')
+		l.operator("spl.send_to_mmdtools", icon='EXPORT')
+	
+		l.separator()
+		l.label(text="Save / Load", icon='FILE')
+		l.operator("spl.load_from_json", icon='FILE_FOLDER')
+		l.operator("spl.save_to_json", icon='CURRENT_FILE')
+		l.separator()
+		l.operator("spl.load_from_csv", icon='FILE_FOLDER')
+		l.operator("spl.save_to_csv", icon='CURRENT_FILE')
+
 # Panel drawer for Property Panel and 3D View Side Panel
 def draw_main_panel(self, context):
 	l:bpy.types.UILayout = self.layout
@@ -103,7 +138,7 @@ def draw_main_panel(self, context):
 	# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
 	l.label(text="PoseBooks:", icon='PRESET')
 	row = l.row( align=False )
-	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=4)
+	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=5)
 	#row.prop_search(spl, "active_list_name", spl, "books", text="")
 	row = row.column(align=True)
 	row.operator( 'spl.add_book', text='', icon='ADD')
@@ -111,14 +146,10 @@ def draw_main_panel(self, context):
 	row.separator()
 	row.operator( 'spl.move_book', text='', icon='TRIA_UP').direction = 'UP'
 	row.operator( 'spl.move_book', text='', icon='TRIA_DOWN').direction = 'DOWN'
-
-	# PoseBook Util buttons
-	l.label(text="Utilities", icon='PREFERENCES')
-	row = l.row(align=False)
-	row.operator( 'spl.auto_set_pose_category', icon='PRESET')
-	row.operator( 'spl.clean_poses', icon='TRASH')
-	l.operator("spl.batch_rename_bones", icon='PRESET')
-
+	row.separator()
+	# PoseBook submenu
+	row.menu( 'SPL_MT_PoseBookMenu', text='', icon='DOWNARROW_HLT')
+	
 
 	# Draw the pose list as a UIList, and add buttons for pose operations
 	if book:
@@ -136,7 +167,7 @@ def draw_main_panel(self, context):
 		row.prop(book, 'category_filter', expand=True)
 		
 		row = l.row()
-		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=8)
+		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=9)
 
 		col = row.column(align=True)
 		col.operator("spl.add_pose", text="", icon='ADD')
@@ -157,7 +188,7 @@ def draw_main_panel(self, context):
 		col.operator("spl.move_pose_to_posebook", text="", icon='FILE_PARENT')
 
 		col.separator()
-		col.operator("spl.reset_book", text="", icon='X')
+		col.operator("spl.reset_book_values", text="", icon='X')
 
 		# Rest poses in the book button
 		col = l.column(align=True)
@@ -299,11 +330,13 @@ class SPL_PT_PoseBookConverter(Panel):
 _classes = [ 
 	SPL_UL_PoseCategoryList,
 	SPL_UL_PoseBook,
+	SPL_MT_PoseBookMenu,
+	SPL_MT_ConvertMenu,
 	SPL_UL_BoneList,
 	SPL_PT_PoseLibPropPanel,
 	SPL_PT_PoseLibrarySidePanel,
 	SPL_PT_PoseBoneData,
-	SPL_PT_PoseBookConverter,
+	# SPL_PT_PoseBookConverter,
 ]
 
 # Register & Unregister
