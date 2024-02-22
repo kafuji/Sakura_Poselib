@@ -1,6 +1,8 @@
 Category	English	Japanese
 # Translate table for Sakura Poselib
 
+*	PoseBook	ポーズブック
+
 O	Load from Pose Library	ポーズライブラリから読み込み
 *	Load the active Pose Library to PoseBook	アクティブなポーズライブラリをポーズブックに読み込みます
 
@@ -84,6 +86,11 @@ O	Clean Poses	ポーズデータを掃除
 O	Move Pose to PoseBook	ポーズをポーズブックに移動
 *	Move the active pose to another PoseBook	アクティブなポーズを別のポーズブックに移動します
 *	Copy the pose instead of moving it	ポーズを移動する代わりにコピーします
+
+O	Merge PoseBook	ポーズブックを統合
+*	Merge the active PoseBook to another PoseBook	アクティブなポーズブックを別のポーズブックに統合します
+*	Name of the target PoseBook	統合先ポーズブックの名前
+*	Copy the poses instead of moving them	ポーズを移動する代わりにコピーします
 
 *	Check Bone Name	ボーン名前をチェック
 *	Remove/report bones with invalid names (which are not in the armature)	無効な名前のボーン（アーマチュアにないボーン）を削除/報告します

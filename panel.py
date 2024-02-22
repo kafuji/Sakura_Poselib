@@ -90,9 +90,7 @@ class SPL_MT_PoseBookMenu(bpy.types.Menu):
 
 	def draw(self, context):
 		l:bpy.types.UILayout = self.layout
-		l.operator( 'spl.clean_poses', text='Clean Poses', icon='TRASH')
-		l.operator( 'spl.auto_set_pose_category', text='Auto Set Pose Category', icon='PRESET')
-		l.operator( 'spl.batch_rename_bones', text='Batch Rename Bones', icon='PRESET')
+		l.operator( 'spl.merge_posebook', icon='OUTLINER_OB_GROUP_INSTANCE')
 		l.separator()
 		l.menu( 'SPL_MT_ConvertMenu', text='Convert', icon='EXPORT')
 
@@ -104,19 +102,35 @@ class SPL_MT_ConvertMenu(bpy.types.Menu):
 	def draw(self, context):
 		l:bpy.types.UILayout = self.layout
 		l.label(text="Import / Export", icon='IMPORT')
-		l.operator("spl.load_from_poselibrary", icon='IMPORT')
-		l.operator("spl.convert_to_poselibrary", icon='EXPORT')
+		l.operator('spl.load_from_poselibrary', icon='IMPORT')
+		l.operator('spl.convert_to_poselibrary', icon='EXPORT')
 		l.separator()
-		l.operator("spl.load_from_mmdtools", icon='IMPORT')
-		l.operator("spl.send_to_mmdtools", icon='EXPORT')
+		l.operator('spl.load_from_mmdtools', icon='IMPORT')
+		l.operator('spl.send_to_mmdtools', icon='EXPORT')
 	
 		l.separator()
 		l.label(text="Save / Load", icon='FILE')
-		l.operator("spl.load_from_json", icon='FILE_FOLDER')
-		l.operator("spl.save_to_json", icon='CURRENT_FILE')
+		l.operator('spl.load_from_json', icon='FILE_FOLDER')
+		l.operator('spl.save_to_json', icon='CURRENT_FILE')
 		l.separator()
-		l.operator("spl.load_from_csv", icon='FILE_FOLDER')
-		l.operator("spl.save_to_csv", icon='CURRENT_FILE')
+		l.operator('spl.load_from_csv', icon='FILE_FOLDER')
+		l.operator('spl.save_to_csv', icon='CURRENT_FILE')
+
+
+# Submenu for Pose List
+class SPL_MT_PoseListMenu(bpy.types.Menu):
+	bl_label = "Pose Operations"
+	bl_idname = "SPL_MT_PoseListMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator('spl.move_pose_to_posebook', icon='FILE_PARENT')
+		l.separator()
+		l.operator( 'spl.auto_set_pose_category', icon='LINENUMBERS_ON')
+		l.operator( 'spl.batch_rename_bones', icon='SORTALPHA')
+		l.operator( 'spl.clean_poses', icon='BRUSH_DATA')
+
+
 
 # Panel drawer for Property Panel and 3D View Side Panel
 def draw_main_panel(self, context):
@@ -136,7 +150,7 @@ def draw_main_panel(self, context):
 	book = spl.get_active_book()
 
 	# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
-	l.label(text="PoseBooks:", icon='PRESET')
+	l.label(text="PoseBooks:", icon='ASSET_MANAGER')
 	row = l.row( align=False )
 	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=5)
 	#row.prop_search(spl, "active_list_name", spl, "books", text="")
@@ -170,25 +184,24 @@ def draw_main_panel(self, context):
 		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=9)
 
 		col = row.column(align=True)
-		col.operator("spl.add_pose", text="", icon='ADD')
-		col.operator("spl.remove_pose", text="", icon='REMOVE')
+		col.operator('spl.add_pose', text="", icon='ADD')
+		col.operator('spl.remove_pose', text="", icon='REMOVE')
 
 		col.separator()
 
 		# Up/Down buttons for moving poses in the list
-		col.operator("spl.move_pose", text="", icon='TRIA_UP').direction = 'UP'
-		col.operator("spl.move_pose", text="", icon='TRIA_DOWN').direction = 'DOWN'
+		col.operator('spl.move_pose', text="", icon='TRIA_UP').direction = 'UP'
+		col.operator('spl.move_pose', text="", icon='TRIA_DOWN').direction = 'DOWN'
 
 		# Top and Bottom buttons for moving poses to the top or bottom of the list
 		col.separator()
-		col.operator("spl.move_pose", text="", icon='TRIA_UP_BAR').direction = 'TOP'
-		col.operator("spl.move_pose", text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
+		col.operator('spl.move_pose', text="", icon='TRIA_UP_BAR').direction = 'TOP'
+		col.operator('spl.move_pose', text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
 
 		col.separator()
-		col.operator("spl.move_pose_to_posebook", text="", icon='FILE_PARENT')
-
+		col.operator('spl.reset_book_values', text="", icon='X')
 		col.separator()
-		col.operator("spl.reset_book_values", text="", icon='X')
+		col.menu( 'SPL_MT_PoseListMenu', text='', icon='DOWNARROW_HLT')
 
 		# Rest poses in the book button
 		col = l.column(align=True)
@@ -332,6 +345,7 @@ _classes = [
 	SPL_UL_PoseBook,
 	SPL_MT_PoseBookMenu,
 	SPL_MT_ConvertMenu,
+	SPL_MT_PoseListMenu,
 	SPL_UL_BoneList,
 	SPL_PT_PoseLibPropPanel,
 	SPL_PT_PoseLibrarySidePanel,

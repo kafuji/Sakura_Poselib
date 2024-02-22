@@ -477,6 +477,7 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
 
         return {'FINISHED'}
 
+
 # Operator: Remove Active Pose from Pose List
 class SPL_OT_RemovePose(bpy.types.Operator):
     bl_idname = "spl.remove_pose"
@@ -558,6 +559,65 @@ class SPL_OT_MovePoseToPoseBook(bpy.types.Operator):
         # Remove the pose from the current posebook
         if not self.do_copy:
             book.remove_pose(pose)
+
+        return {'FINISHED'}
+
+# Operator: Merge PoseBook to another
+class SPL_OT_MergePoseBook(bpy.types.Operator):
+    bl_idname = "spl.merge_posebook"
+    bl_label = "Merge PoseBook"
+    bl_description = "Merge the active PoseBook to another PoseBook"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    posebook_name: StringProperty(
+        name="PoseBook",
+        description="Name of the target PoseBook",
+        default="",
+    )
+
+    do_copy: BoolProperty(
+        name="Copy",
+        description="Copy the poses instead of moving them",
+        default=False
+    )
+
+    @classmethod
+    @requires_active_posebook
+    def poll(cls, context):
+        return True
+
+    # show Options first
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+    
+    # Draw the options
+    def draw(self, context):
+        l = self.layout
+        l.use_property_split = True
+        l.prop_search(self, "posebook_name", context.object.sakura_poselib, "books", text="PoseBook")
+        l.prop(self, "do_copy")
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+
+        # Get the target posebook
+        target_book = spl.get_book_by_name(self.posebook_name)
+        if not target_book:
+            self.report({'WARNING'}, "PoseBook not found")
+            return {'CANCELLED'}
+        if target_book == book:
+            self.report({'WARNING'}, "Cannot merge to the same PoseBook")
+            return {'CANCELLED'}
+
+        # Merge the posebook to the target posebook
+        for pose in book.poses:
+            newpose = target_book.add_pose()
+            newpose.copy_from(pose)
+
+        # Remove the posebook
+        if not self.do_copy:
+            spl.remove_book(book)
 
         return {'FINISHED'}
 

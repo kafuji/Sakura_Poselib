@@ -119,7 +119,7 @@ class PoseData(PropertyGroup):
 
 		self.bones.clear()
 		for bone in pose.bones:
-			new_bone = self.add_bone()
+			new_bone = self.add_bone(bone.name)
 			new_bone.copy_from(bone)
 
 # PoseBook (Collection of Poses)
