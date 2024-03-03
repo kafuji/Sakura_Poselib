@@ -375,8 +375,6 @@ _POSE_CATEGORIES = [
 ]
 
 
-
-
 # Save PoseBook into a file (CSV)
 def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
 	poses = book.poses
@@ -411,13 +409,14 @@ def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True, use_a
 		# write data
 		for pose in poses:
 			pose_name = pose.name_alt if use_alt_names and pose.name_alt else pose.name
+			pose_name_alt = pose.name if use_alt_names and pose.name_alt else pose.name
 			# Write a pose header
-			# format: f"PmxMorph,{pose.name},{pose.name},{category_index},2(BoneMorph)"
+			# format: f"PmxMorph,{pose.name_j},{pose.name_e},{category_index},2(BoneMorph)"
 			if pose.category not in _POSE_CATEGORIES:
 				category_index = 4
 			else:
 				category_index = _POSE_CATEGORIES.index(pose.category)
-			pose_header = f'PmxMorph,"{pose_name}","",{category_index},2\n'
+			pose_header = f'PmxMorph,"{pose_name}","{pose_name_alt}",{category_index},2\n'
 			csvfile.write(pose_header)
 
 			# Write a bone list header
@@ -526,8 +525,10 @@ def load_book_from_csv( book, filename, scale=0.08 ):
 			# if the line is PMXMorph header, create a new pose
 			if row[0].startswith('PmxMorph'):
 				pose_name = row[1].strip('"')
+				pose_name_e = row[2].strip('"')
 				cat_index = int(row[3])
 				pose = _add_pose(pose_name, cat_index)
+				pose.name_alt = pose_name_e
 				continue
 
 			# if the line is PmxBoneMorph, add a bone data to the pose indicated by the pose name

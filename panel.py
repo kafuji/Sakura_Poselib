@@ -150,7 +150,10 @@ def draw_main_panel(self, context):
 	book = spl.get_active_book()
 
 	# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
-	l.label(text="PoseBooks:", icon='ASSET_MANAGER')
+	row = l.row(align=True)
+	row.label(text="PoseBooks:", icon='ASSET_MANAGER')
+	row.label(text=arm.name, icon='OUTLINER_OB_ARMATURE', translate=False )
+
 	row = l.row( align=False )
 	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=5)
 	#row.prop_search(spl, "active_list_name", spl, "books", text="")

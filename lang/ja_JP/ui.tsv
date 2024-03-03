@@ -38,7 +38,7 @@ O	Save to CSV	CSVファイルに書き出し
 *	Use MMD Bone Names	MMDボーン名を使用
 *	Use MMD bone names (mmd_tools:mmd_bone.name) instead of Blender bone names	Blenderボーン名の代わりにMMDボーン名（mmd_tools:mmd_bone.name）を使用します
 *	Use Alt Pose Names	別名を使用
-*	Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	デフォルトのポーズ名の代わりに別名（PoseData.name_alt）を使用します。主に翻訳用です
+*	Use alternative pose names as primary (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	主キーとして、デフォルトのポーズ名（主に翻訳用）の代わりに、別名（PoseData.name_alt）を使用します
 
 *	Replace (Current)	置き換え（現在のポーズ）
 *	Replace...	置き換え...

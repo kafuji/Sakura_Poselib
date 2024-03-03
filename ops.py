@@ -217,7 +217,7 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
 
     use_alt_pose_names: BoolProperty(
         name="Use Alt Pose Names",
-        description="Use alternative pose names (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)",
+        description="Use alternative pose names as primary (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)",
         default=True,
     )
 
