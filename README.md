@@ -17,6 +17,19 @@ The author is not responsible for any results from using this add-on. Please use
 
 MIT License.
 
+---
+
 ## Author
 
-Kafuji Sato / VR Character Workshop
+**Kafuji Sato** - [VR Character Workshop](https://fantia.jp/fanclubs/3967)
+
+[Twitter](https://twitter.com/Kafuji)
+[GitHub](https://kafuji.github.io)
+
+
+- Other sites
+[Fanbox](https://kafuji.fanbox.cc/)
+[BlenderMarket](https://blendermarket.com/creators/kafuji)
+[Gumroad](https://gumroad.com/kafuji)
+[DLSite](https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG40057.html)
+[Patreon](https://www.patreon.com/kafuji)
