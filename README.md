@@ -15,7 +15,7 @@ The author is not responsible for any results from using this add-on. Please use
 
 ## License
 
-MIT License.
+[MIT License](https://opensource.org/license/mit)
 
 ---
 
@@ -33,3 +33,8 @@ MIT License.
 [Gumroad](https://gumroad.com/kafuji)
 [DLSite](https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG40057.html)
 [Patreon](https://www.patreon.com/kafuji)
+
+# Copyright
+
+© 2021 Kafuji Sato, All rights reserved.
+```
