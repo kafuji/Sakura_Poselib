@@ -22,18 +22,13 @@ The author is not responsible for any results from using this add-on. Please use
 
 ## Author
 
-**Kafuji Sato** - [VR Character Workshop](https://fantia.jp/fanclubs/3967)
-
-- [Twitter](https://twitter.com/Kafuji)
-- [GitHub](https://kafuji.github.io)
-
-
-- Other sites
-    - [Fanbox](https://kafuji.fanbox.cc/)
-    - [BlenderMarket](https://blendermarket.com/creators/kafuji)
-    - [Gumroad](https://gumroad.com/kafuji)
-    - [DLSite](https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG40057.html)
-    - [Patreon](https://www.patreon.com/kafuji)
+- **Kafuji Sato** - VR Character Workshop
+  - [Twitter](https://twitter.com/kafuji)
+  - [GitHub](https://kafuji.github.io)
+  - [Fantia](https://fantia.jp/fanclubs/3967)
+  - [Fanbox](https://kafuji.fanbox.cc/)
+  - [Gumroad](https://kafuji.gumroad.com)
+  - [Blender Market](https://blendermarket.com/creators/kafuji)
 
 # Copyright
 
