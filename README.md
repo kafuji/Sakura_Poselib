@@ -4,6 +4,13 @@
 
 ***Yet another pose library with a lot of handy features.***
 
+## Overview
+
+ - Adds simple and handy pose libraries to armatures.
+ - Quickly add/update/preview poses form context menu.
+ - Blend multiple poses with sliders.
+ - Compatible with mmd_tools, PMX Editor via import/export functions.
+
 ## Online Document
 
 - [English](https://kafuji.github.io/Sakura-Creative-Suite/en/addons/Sakura_PoseLib/)
