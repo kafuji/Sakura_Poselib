@@ -16,6 +16,11 @@
 - [English](https://kafuji.github.io/Sakura-Creative-Suite/en/addons/Sakura_PoseLib/)
 - [日本語](https://kafuji.github.io/Sakura-Creative-Suite/ja/addons/Sakura_PoseLib/)
 
+## Change Log
+
+- 2024/04/08 v.1.0.1
+  - Fixed an issue that caused error on the add-on load in MacOS/Linux. (Fixed how to handle file path)
+
 ## Disclaimer
 
 The author is not responsible for any results from using this add-on. Please use it at your own risk.
