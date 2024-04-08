@@ -16,7 +16,7 @@
 
 import bpy
 _trans_table = {}
-_trans_dir = '\\lang'
+_trans_dir = 'lang'
 _delimiters = {
     '.csv': ',',
     '.tsv': '\t',
@@ -26,7 +26,7 @@ _delimiters = {
 # Register translations
 def register():
     import os
-    dir = os.path.dirname(__file__) + _trans_dir
+    dir = os.path.join( os.path.dirname(__file__),  _trans_dir )
     global _trans_table
 
     locales = []
