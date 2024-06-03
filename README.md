@@ -18,7 +18,19 @@
 
 ## Change Log
 
-- 2024/04/08 v.1.0.1
+- 2024/06/03 v1.1.0
+  - Pose List:
+    - Added 'Batch Rename Poses' function.
+    - Added Display Settings. Buttons for Apply, Replace, Select Bones are now switchable.
+    - Auto Set Pose Category operator now handles 'eyelid', 'eyelids' as EYE category.
+    - Minor UI improvements.
+  - Add Pose Operator:
+    - Fixed bug where pose category was not set when creating new pose.
+    - Category is now auttomatically set by using the category_filter of active pose book.
+  - Preferences:
+    - Added Pose List Display Settings.
+
+- 2024/04/08 v1.0.1
   - Fixed an issue that caused error on the add-on load in MacOS/Linux. (Fixed how to handle file path)
 
 ## Disclaimer

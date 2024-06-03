@@ -1,6 +1,21 @@
 Category	English	Japanese
 # Translate table for Sakura Poselib
 
+*	Yet another pose library with handful of features	便利な機能がいっぱいのポーズライブラリ
+
+*	Pose List Display Settings	ポーズリスト表示設定
+*	Display Settings:	表示設定：
+*	Show Apply Buttons	適用ボタンを表示
+*	Show apply buttons in the pose list	ポーズリストに適用ボタンを表示します
+*	Show Select Bones Buttons	ボーン選択ボタンを表示
+*	Show select bones buttons in the pose list	ポーズリストにボーン選択ボタンを表示します
+*	Show Replace Buttons	置き換えボタンを表示
+*	Show replace buttons in the pose list	ポーズリストに置き換えボタンを表示します
+
+*	Developer Settings	開発者設定
+*	Developer Mode	開発者モード
+
+
 *	PoseBook	ポーズブック
 
 O	Load from Pose Library	ポーズライブラリから読み込み
@@ -119,7 +134,8 @@ O	Remove Bone from Pose	ポーズからボーンを削除
 *	Transforms:	変形一覧：
 
 *	Save / Load	保存 / 読み込み
-s
+
+O	Batch Rename Poses	ポーズを一括リネーム
 O	Batch Rename Bones	ボーンを一括リネーム
 *	Rename bones within all Pose Data in the active PoseBook (useful for retargeting)	アクティブなポーズブック内のすべてのポーズデータのボーンを一括リネームします（リターゲティングに便利）
 *	Process All PoseBooks	すべてのポーズブックを処理

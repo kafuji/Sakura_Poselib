@@ -319,7 +319,7 @@ def save_book_to_json( book, filepath ):
 
 
 EYEBROW = {'eyebrow', 'eyebrows', 'brow', 'brows', 'mayu'}
-EYE = {'eye', 'eyes', 'iris', 'pupil', 'pupils', 'me' }
+EYE = {'eye', 'eyes', 'eyelid', 'eyelids', 'iris', 'pupil', 'pupils', 'me' }
 MOUTH = {'mouth', 'lips', 'lip', 'kuchibiru', 'kuchi'}
 import re
 # Helper: Guess pose category from pose name

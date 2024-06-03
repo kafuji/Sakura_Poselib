@@ -21,17 +21,31 @@ class SPL_UL_PoseBook(UIList):
 	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 		l:bpy.types.UILayout = layout
 
-		col = l.column(align=True)
-		sp = col.split(factor=0.2, align=True)
+		prefs = bpy.context.preferences.addons[__package__].preferences
+
+		row = l.row(align=True)
+		sp = row.split(factor=0.2, align=True)
 		sp.prop( item, 'category', text='', emboss=False)
 		sp.prop( item, 'name', text='', emboss=False )
-		if data.show_alt_pose_names:
+		if prefs.show_alt_pose_names:
 			sp.prop( item, 'name_alt', text='', emboss=True )
 		sp.prop( item, 'value', slider=True, text='' )
-		col = l.column(align=True)
-		row = col.row(align=True)
+		#col = l.column(align=True)
+		#row = l.row(align=True)
+
+		if prefs.show_apply_buttons or prefs.show_replace_buttons or prefs.show_select_bones_buttons:
+			row.separator()
+
+		if prefs.show_apply_buttons:
+			row.operator( 'spl.apply_pose', text='', icon='VIEWZOOM').pose_index = index
+		if prefs.show_replace_buttons:
+			row.operator( 'spl.replace_pose', text='', icon='GREASEPENCIL').pose_index = index
+		if prefs.show_select_bones_buttons:
+			row.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
+		
+
 		# row.operator( 'spl.apply_pose', text='', icon='VIEWZOOM').pose_index = index # apply single pose
-		row.operator( 'spl.replace_pose', text='', icon='GREASEPENCIL').pose_index = index # replace pose data with current pose
+		# row.operator( 'spl.replace_pose', text='', icon='GREASEPENCIL').pose_index = index # replace pose data with current pose
 		# col.operator( 'spl.select_bones_in_pose', text='', icon='RESTRICT_SELECT_OFF').pose_index = index
 
 	def filter_items(self, context: bpy.types.Context, data: bpy.types.AnyType, property: str):
@@ -127,10 +141,28 @@ class SPL_MT_PoseListMenu(bpy.types.Menu):
 		l.operator('spl.move_pose_to_posebook', icon='FILE_PARENT')
 		l.separator()
 		l.operator( 'spl.auto_set_pose_category', icon='LINENUMBERS_ON')
+		l.operator( 'spl.batch_rename_poses', icon='SORTALPHA')
 		l.operator( 'spl.batch_rename_bones', icon='SORTALPHA')
 		l.operator( 'spl.clean_poses', icon='BRUSH_DATA')
 
+# Submenu for Pose List Display Settings
+class SPL_MT_PoseListDisplayMenu(bpy.types.Menu):
+	bl_label = "Pose List Display Settings"
+	bl_idname = "SPL_MT_PoseListDisplayMenu"
 
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		prefs = bpy.context.preferences.addons[__package__].preferences
+
+		box = l.box()
+		box.label(text="Pose List Display Settings")
+		flow = box.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=False)
+		flow.prop(prefs, "show_alt_pose_names", icon='TEXT')
+		flow.prop(prefs, "show_apply_buttons", icon='VIEWZOOM')
+		flow.prop(prefs, "show_select_bones_buttons", icon='RESTRICT_SELECT_OFF' )
+		flow.prop(prefs, "show_replace_buttons", icon='GREASEPENCIL')
+
+		return
 
 # Panel drawer for Property Panel and 3D View Side Panel
 def draw_main_panel(self, context):
@@ -176,9 +208,20 @@ def draw_main_panel(self, context):
 		row.alignment = 'LEFT'
 		row.label(text=book.name, translate=False, icon='POSE_HLT')
 		row.label(text="Poses:")
+
+		prefs = bpy.context.preferences.addons[__package__].preferences
 		col = sp.column(align=True)
 		col.alignment = 'RIGHT'
-		col.prop(book, 'show_alt_pose_names', toggle=True, icon='TEXT')
+		row = col.row(align=True)
+		row.alignment = 'RIGHT'
+		row.label(text="Display Settings:")
+		row.prop(prefs, 'show_alt_pose_names', toggle=True, icon='TEXT', text='')
+		row.prop(prefs, 'show_apply_buttons', toggle=True, icon='VIEWZOOM', text='')
+		row.prop(prefs, 'show_select_bones_buttons', toggle=True, icon='RESTRICT_SELECT_OFF', text='')
+		row.prop(prefs, 'show_replace_buttons', toggle=True, icon='GREASEPENCIL', text='')
+
+
+		#col.prop(book, 'show_alt_pose_names', toggle=True, icon='TEXT')
 
 		row = l.row()
 		row.prop(book, 'category_filter', expand=True)
@@ -349,6 +392,7 @@ _classes = [
 	SPL_MT_PoseBookMenu,
 	SPL_MT_ConvertMenu,
 	SPL_MT_PoseListMenu,
+	SPL_MT_PoseListDisplayMenu,
 	SPL_UL_BoneList,
 	SPL_PT_PoseLibPropPanel,
 	SPL_PT_PoseLibrarySidePanel,

@@ -370,7 +370,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
     bl_options = {'REGISTER', 'UNDO'}
 
     pose_name: StringProperty(
-        name="New Pose",
+        name="Pose Name",
         description="Name of the new pose",
         default="New Pose",
     )
@@ -394,6 +394,12 @@ class SPL_OT_AddPose( bpy.types.Operator ):
     def poll(cls, context):
         return True
 
+    # prefill category from current book.category_filter selection
+    def invoke(self, context, event):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+        self.category = book.category_filter
+        return self.execute(context)
 
     def execute(self, context):
         spl = get_poselib_from_context(context)
@@ -405,6 +411,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
 
         # Create new pose container
         new_pose = book.add_pose( self.pose_name )
+        new_pose.category = self.category
 
         # Save only bones contributing to the deformation
         for bone in arm.pose.bones:
@@ -1114,17 +1121,70 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
 
 
 import re
+
+class RenameOp:
+    search: bpy.props.StringProperty(name="Search", default="")
+    replace: bpy.props.StringProperty(name="Replace", default="")
+    use_regex: bpy.props.BoolProperty(name="Use Regex", default=False)
+
+    def draw_rename_options(self, layout: bpy.types.UILayout):
+        box = layout.box()
+        box.prop(self, "search")
+        box.prop(self, "replace")
+        box.prop(self, "use_regex")
+
+    def do_rename(self, tgt_str, search, replace, use_regex) -> str:
+        if use_regex:
+            try:
+                return re.sub(search, replace, tgt_str)
+            except re.error as e:
+                self.report({'ERROR'}, f"Invalid regular expression: {e}")
+                return tgt_str
+        else:
+            return tgt_str.replace(search, replace)
+
+
+# Operator: Batch Rename Poses in the PoseBook
+class SPL_OT_BatchRenamePoses(bpy.types.Operator, RenameOp):
+    bl_idname = "spl.batch_rename_poses"
+    bl_label = "Batch Rename Poses"
+    bl_description = "Rename poses in the active PoseBook"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        self.draw_rename_options(layout)
+
+    @classmethod
+    @requires_active_posebook
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+
+        for pose in book.poses:
+            newname = self.do_rename(pose.name, self.search, self.replace, self.use_regex)
+            pose.name = newname
+            if newname != pose.name:
+                self.report({'INFO'}, f"Pose '{pose.name}' renamed to '{newname}', by naming conflict")
+
+        self.report({'INFO'}, "Pose renaming completed")
+        return {'FINISHED'}
+
+
 # Operator: Batch Rename Bones
-class SPL_OT_BatchRenameBones(bpy.types.Operator):
+class SPL_OT_BatchRenameBones(bpy.types.Operator, RenameOp):
     bl_idname = "spl.batch_rename_bones"
     bl_label = "Batch Rename Bones"
     bl_description = "Rename bones within all Pose Data in the active PoseBook (useful for retargeting)"
     bl_options = {'REGISTER', 'UNDO'}
 
     all_books: bpy.props.BoolProperty(name="Process All PoseBooks", default=False)
-    search: bpy.props.StringProperty(name="Search", default="")
-    replace: bpy.props.StringProperty(name="Replace", default="")
-    use_regex: bpy.props.BoolProperty(name="Use Regex", default=False)
 
     def draw(self, context):
         layout = self.layout
@@ -1132,9 +1192,9 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator):
         layout.use_property_decorate = False
 
         layout.prop(self, "all_books")
-        layout.prop(self, "search")
-        layout.prop(self, "replace")
-        layout.prop(self, "use_regex")
+
+        # Draw rename options
+        self.draw_rename_options(layout)
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -1157,14 +1217,19 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator):
         for posebook in books:
             for pose in posebook.poses:
                 for bone_transform in pose.bones:
-                    if self.use_regex:
-                        try:
-                            bone_transform.name = re.sub(self.search, self.replace, bone_transform.name)
-                        except re.error as e:
-                            self.report({'ERROR'}, f"Invalid regular expression: {e}")
-                            return {'CANCELLED'}
-                    else:
-                        bone_transform.name = bone_transform.name.replace(self.search, self.replace)
+                    newname = self.do_rename(bone_transform.name, self.search, self.replace, self.use_regex)
+                    bone_transform.name = newname
+                    if newname != bone_transform.name:
+                        self.report({'INFO'}, f"Bone '{bone_transform.name}' renamed to '{newname}', by naming conflict")
+                    
+                    # if self.use_regex:
+                    #     try:
+                    #         bone_transform.name = re.sub(self.search, self.replace, bone_transform.name)
+                    #     except re.error as e:
+                    #         self.report({'ERROR'}, f"Invalid regular expression: {e}")
+                    #         return {'CANCELLED'}
+                    # else:
+                    #     bone_transform.name = bone_transform.name.replace(self.search, self.replace)
 
         self.report({'INFO'}, "Batch renaming completed")
         return {'FINISHED'}
