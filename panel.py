@@ -244,6 +244,10 @@ def draw_main_panel(self, context):
 		col.operator('spl.move_pose', text="", icon='TRIA_UP_BAR').direction = 'TOP'
 		col.operator('spl.move_pose', text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
 
+		# Duplicate pose button
+		col.separator()
+		col.operator('spl.duplicate_pose', text="", icon='DUPLICATE')
+
 		col.separator()
 		col.operator('spl.reset_book_values', text="", icon='X')
 		col.separator()

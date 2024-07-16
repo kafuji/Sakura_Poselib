@@ -389,6 +389,18 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         default=True
     )
 
+    placement: EnumProperty(
+        name="Placement",
+        description="Where to place the new pose in the PoseBook",
+        items=(
+            ('INSERT', "Insert", "Insert the new pose below the active pose"),
+            ('APPEND', "Append", "Append the new pose at the end of the PoseBook"),
+            ('PREPEND', "Prepend", "Prepend the new pose at the beginning of the PoseBook"),
+        ),
+        default='INSERT'
+    )
+
+
     @classmethod
     @requires_active_armature
     def poll(cls, context):
@@ -412,6 +424,17 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         # Create new pose container
         new_pose = book.add_pose( self.pose_name )
         new_pose.category = self.category
+
+        # Place the new pose in the PoseBook
+        if self.placement == 'APPEND':
+            book.active_pose_index = len(book.poses) - 1
+        elif self.placement == 'INSERT':
+            new_index = book.active_pose_index + 1
+            book.poses.move(len(book.poses) - 1, new_index)
+            book.active_pose_index = new_index
+        elif self.placement == 'PREPEND':
+            book.poses.move(len(book.poses) - 1, 0)
+            book.active_pose_index = 0
 
         # Save only bones contributing to the deformation
         for bone in arm.pose.bones:
@@ -482,6 +505,50 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
                     target_pose.remove_bone(bd.name)
 
 
+        return {'FINISHED'}
+
+# Operator: Duplicate Pose
+class SPL_OT_DuplicatePose(bpy.types.Operator):
+    bl_idname = "spl.duplicate_pose"
+    bl_label = "Duplicate Pose"
+    bl_description = "Duplicate the active pose and insert it below the active pose"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    @requires_active_pose
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+        active_pose = book.get_active_pose()
+
+        if not active_pose:
+            self.report({'WARNING'}, "No active pose to duplicate")
+            return {'CANCELLED'}
+
+        # Create a new pose
+        new_pose = book.add_pose()
+        new_pose.name = active_pose.name
+        new_pose.name_alt = active_pose.name_alt
+        new_pose.category = active_pose.category
+        new_pose.value = active_pose.value
+
+        # Copy bone data
+        for bone in active_pose.bones:
+            new_bone = new_pose.bones.add()
+            new_bone.name = bone.name
+            new_bone.location = bone.location.copy()
+            new_bone.rotation = bone.rotation.copy()
+            new_bone.scale = bone.scale.copy()
+
+        # Move the new pose to the position right after the active pose
+        new_index = book.active_pose_index + 1
+        book.poses.move(len(book.poses) - 1, new_index)
+        book.active_pose_index = new_index
+
+        self.report({'INFO'}, f"Duplicated pose: {new_pose.name}")
         return {'FINISHED'}
 
 

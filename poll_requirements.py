@@ -9,6 +9,12 @@ def requires_active_armature(func):
     def wrapper(cls, context):
         if not context.object or not context.object.pose:
             return False
+        
+        # Check if the object is library or override library
+        obj = context.object
+        if obj.library or obj.override_library:
+            return False
+
         return func(cls, context)
     return wrapper
 

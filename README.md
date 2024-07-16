@@ -18,6 +18,15 @@
 
 ## Change Log
 
+- 2024/07/16: v1.1.1
+  - Pose List:
+    - Added 'Duplicate Pose' function.
+    - 'Add Pose' operator now inserts new pose next to the active pose.
+      - This behaviour can be changed in the operator options (Insert/Append/Prepend).
+  - General:
+    - All features are now disalbed on Linked/Overrided Library armature objects to prevent causing errors.
+      - Library armature will be supported in the future update.
+
 - 2024/06/03 v1.1.0
   - Pose List:
     - Added 'Batch Rename Poses' function.

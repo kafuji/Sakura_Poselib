@@ -164,7 +164,6 @@ class PoseBook(PropertyGroup):
 		pose = self.poses.add()
 		if name:
 			pose.name = name
-		self.active_pose_index = len(self.poses) - 1
 		return pose
 	
 	def remove_pose_by_index(self, index):
