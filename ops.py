@@ -3,13 +3,10 @@
 import bpy
 import sys, inspect
 from bpy.props import *
-from mathutils import Vector, Quaternion, Matrix
-import math
 
-from . import mmd
-from . import internal
+from . import mmd, internal, utils
 
-from .props import get_poselib, get_poselib_from_context
+from .spl import get_poselib_from_context, update_combined_pose, POSE_CATEGORIES
 from .poll_requirements import *
 
 
@@ -299,6 +296,7 @@ class SPL_OT_AddPoseBook( bpy.types.Operator ):
 
     @classmethod
     @requires_active_armature
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -320,6 +318,7 @@ class SPL_OT_RemovePoseBook( bpy.types.Operator ):
 
     @classmethod
     @requires_active_posebook
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -350,15 +349,21 @@ class SPL_OT_ApplyPose( bpy.types.Operator ):
 
     @classmethod
     @requires_active_pose
+    # @requires_animation_disabled
     def poll(cls, context):
         return True
 
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        pose = book.get_active_pose()
+        target_pose = book.get_active_pose()
 
-        internal.apply_pose(pose, self.influence, reset_others=True )
+        for pose in book.poses:
+            if pose == target_pose:
+                pose.apply_pose()
+            else:
+                pose.reset_pose()
+
         return {'FINISHED'}
 
 
@@ -378,14 +383,20 @@ class SPL_OT_AddPose( bpy.types.Operator ):
     category: EnumProperty(
         name="Category",
         description="Category of the new pose",
-        items=internal.POSE_CATEGORIES,
+        items= POSE_CATEGORIES,
         default="ALL",
     )
     
 
-    only_visible_bones: BoolProperty(
-        name="Only Visible Bones", 
+    ignore_hidden_bones: BoolProperty(
+        name="Ignore Hidden Bones", 
         description="Evaluate only bones visible in the viewport",
+        default=False
+    )
+
+    ignore_driven_bones: BoolProperty(
+        name="Ignore Driven Bones",
+        description="Ignore bones which any of transforms are driven by drivers",
         default=True
     )
 
@@ -403,6 +414,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
 
     @classmethod
     @requires_active_armature
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -416,7 +428,6 @@ class SPL_OT_AddPose( bpy.types.Operator ):
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        arm = spl.id_data
 
         if not book: # Create new
             book = spl.add_book("New PoseBook")
@@ -425,29 +436,22 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         new_pose = book.add_pose( self.pose_name )
         new_pose.category = self.category
 
+        new_pose.from_current_pose(
+            ignore_hidden_bones=self.ignore_hidden_bones, 
+            ignore_driven_bones=self.ignore_driven_bones
+        )
+
         # Place the new pose in the PoseBook
         if self.placement == 'APPEND':
             book.active_pose_index = len(book.poses) - 1
         elif self.placement == 'INSERT':
             new_index = book.active_pose_index + 1
-            book.poses.move(len(book.poses) - 1, new_index)
+            book.poses.move(len(book.poses) - 1, new_index) # this breaks new_pose reference
             book.active_pose_index = new_index
         elif self.placement == 'PREPEND':
-            book.poses.move(len(book.poses) - 1, 0)
+            book.poses.move(len(book.poses) - 1, 0) # this breaks new_pose reference
             book.active_pose_index = 0
 
-        # Save only bones contributing to the deformation
-        for bone in arm.pose.bones:
-            if self.only_visible_bones:
-                if not internal.is_pose_bone_visible(bone):
-                    continue
-
-            if bone.matrix_basis != Matrix.Identity(4): # Check if the bone is affected by the pose
-                bd = new_pose.add_bone(bone.name)
-                bd.location = bone.location
-                bd.rotation = internal.get_pose_bone_rotation_quaternion(bone)
-                bd.scale = bone.scale
-        
         return {'FINISHED'}
 
 
@@ -460,14 +464,21 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
 
     pose_index: IntProperty(default=-1, options={'HIDDEN'})
 
-    only_visible_bones: BoolProperty(
-        name="Only Visible Bones", 
+    ignore_hidden_bones: BoolProperty(
+        name="Ignore Hidden Bones", 
         description="Evaluate only bones visible in the viewport",
+        default=False
+    )
+
+    ignore_driven_bones: BoolProperty(
+        name="Ignore Driven Bones",
+        description="Evaluate only bones which transforms are not controlled by drivers",
         default=True
     )
 
     @classmethod
     @requires_poses
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -475,7 +486,7 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
         # print("Replace Pose", self.pose_index)
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        arm = spl.id_data
+        arm = spl.get_armature()
 
         # Get the target pose, if pose_index is negative, use the active pose
         pose_index = self.pose_index if self.pose_index >= 0 else book.active_pose_index
@@ -487,23 +498,10 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
 
         # Replace (Overwrite) selected pose
         target_pose = book.get_pose_by_index(pose_index)
-
-        # Save only bones contributing to the deformation
-        for bone in arm.pose.bones:
-            if self.only_visible_bones:
-                if not internal.is_pose_bone_visible(bone):
-                    continue
-
-            if bone.matrix_basis != Matrix.Identity(4):
-                bd = target_pose.get_bone_by_name(bone.name) or target_pose.add_bone(bone.name)
-                bd.location = bone.location
-                bd.rotation = internal.get_pose_bone_rotation_quaternion(bone)
-                bd.scale = bone.scale
-            else: # Remove bone from pose if it is not affected by the pose
-                bd = target_pose.get_bone_by_name(bone.name)
-                if bd:
-                    target_pose.remove_bone(bd.name)
-
+        target_pose.from_current_pose(
+            ignore_hidden_bones=self.ignore_hidden_bones, 
+            ignore_driven_bones=self.ignore_driven_bones
+        )
 
         return {'FINISHED'}
 
@@ -516,6 +514,7 @@ class SPL_OT_DuplicatePose(bpy.types.Operator):
 
     @classmethod
     @requires_active_pose
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -530,22 +529,13 @@ class SPL_OT_DuplicatePose(bpy.types.Operator):
 
         # Create a new pose
         new_pose = book.add_pose()
-        new_pose.name = active_pose.name
-        new_pose.name_alt = active_pose.name_alt
-        new_pose.category = active_pose.category
-        new_pose.value = active_pose.value
-
-        # Copy bone data
-        for bone in active_pose.bones:
-            new_bone = new_pose.bones.add()
-            new_bone.name = bone.name
-            new_bone.location = bone.location.copy()
-            new_bone.rotation = bone.rotation.copy()
-            new_bone.scale = bone.scale.copy()
+        new_pose.copy_from( active_pose )
+        new_pose.name = active_pose.name + "+"
+        new_pose.name_alt = active_pose.name_alt + "+"
 
         # Move the new pose to the position right after the active pose
         new_index = book.active_pose_index + 1
-        book.poses.move(len(book.poses) - 1, new_index)
+        book.poses.move(len(book.poses) - 1, new_index) # this breaks new_pose reference
         book.active_pose_index = new_index
 
         self.report({'INFO'}, f"Duplicated pose: {new_pose.name}")
@@ -561,6 +551,7 @@ class SPL_OT_RemovePose(bpy.types.Operator):
 
     @classmethod
     @requires_active_pose
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -595,6 +586,7 @@ class SPL_OT_MovePoseToPoseBook(bpy.types.Operator):
 
     @classmethod
     @requires_active_pose
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -657,6 +649,7 @@ class SPL_OT_MergePoseBook(bpy.types.Operator):
 
     @classmethod
     @requires_active_posebook
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
@@ -776,34 +769,6 @@ class SPL_OT_SelectBonesInPose( bpy.types.Operator ):
         return {'FINISHED'}
 
 
-def is_matrix_almost_equal(m1, m2, threshold=1e-6):
-    """Check if two matrices are almost equal"""
-    return all(abs(x1 - x2) < threshold for x1, x2 in zip(m1, m2))
-
-def is_vector_almost_equal(v1, v2, threshold=1e-6):
-    """Check if two vectors are almost equal"""
-    return all(abs(x1 - x2) < threshold for x1, x2 in zip(v1, v2))
-
-def has_rotation(q, threshold=1e-6):
-    """Check if the quaternion is less than minimal"""
-    q_normalized = q.normalized()
-    dot_product = q_normalized.dot(Quaternion())
-    angle_diff = 2 * math.acos(min(1.0, abs(dot_product))) 
-    return angle_diff > threshold
-
-def has_translation(v, threshold=1e-6):
-    """Check if the location vector has translation"""
-    return any(abs(x) > threshold for x in v)
-
-def has_scale(v, threshold=1e-6):
-    """Check if the scale vector is less than minimal"""
-    return any(abs(x-1.0) > threshold for x in v)
-
-def has_transform( loc, rot, scale, threshold=1e-6 ):
-    """Check if the transform is less than minimal"""
-    return has_translation(loc, threshold) or has_rotation(rot, threshold) or has_scale(scale, threshold)
-
-
 # Operator: Clean Poses (remove unused/invalid bones in poses within the active posebook)
 class SPL_OT_CleanPoses( bpy.types.Operator ):
     bl_idname = "spl.clean_poses"
@@ -877,7 +842,7 @@ class SPL_OT_CleanPoses( bpy.types.Operator ):
                         continue
                 if self.check_transform:
                     # Remove bones that are not contributing to the deformation
-                    if not has_transform(bone.location, bone.rotation, bone.scale, self.threshold):
+                    if not utils.has_transform(bone.location, bone.rotation, bone.scale, self.threshold):
                         bone_to_remove[bone.name] = "No deformation"
                         continue
 
@@ -895,6 +860,7 @@ class SPL_OT_CleanPoses( bpy.types.Operator ):
 
 # Oerator: Remove Bone from Pose
 class SPL_OT_RemoveBoneFromPose( bpy.types.Operator ):
+    """Remove the selected bone from the active pose"""
     bl_idname = "spl.remove_bone_from_pose"
     bl_label = "Remove Bone from Pose"
     bl_options = {'REGISTER', 'UNDO'}
@@ -903,6 +869,8 @@ class SPL_OT_RemoveBoneFromPose( bpy.types.Operator ):
 
     @classmethod
     @requires_active_pose
+    @requires_animation_disabled
+
     def poll(cls, context):
         return True
 
@@ -924,17 +892,18 @@ class SPL_OT_RemoveBoneFromPose( bpy.types.Operator ):
 
 # Operator: Add selected bone to pose
 class SPL_OT_AddSelectedBoneToPose( bpy.types.Operator ):
+    """Add selected bones to the active pose. You can edit transfrom values manually"""
     bl_idname = "spl.add_selected_bone_to_pose"
     bl_label = "Add Selected Bone to Pose"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     @requires_active_pose
+    @requires_animation_disabled
     def poll(cls, context):
         return context.selected_pose_bones
 
     def execute(self, context):
-        arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
         pose = book.get_active_pose()
@@ -948,7 +917,7 @@ class SPL_OT_AddSelectedBoneToPose( bpy.types.Operator ):
 
             # Update bone data
             bd.location = bone.location
-            bd.rotation = internal.get_pose_bone_rotation_quaternion(bone)
+            bd.rotation = utils.get_pose_bone_rotation_quaternion(bone)
             bd.scale = bone.scale
 
         return {'FINISHED'}
@@ -1006,6 +975,11 @@ class SPL_OT_MovePoseBook( bpy.types.Operator ):
         )
     )
 
+    @classmethod
+    @requires_active_posebook
+    def poll(cls, context):
+        return True
+
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book_index = spl.active_book_index
@@ -1044,9 +1018,8 @@ class SPL_OT_ResetPoseBookValues( bpy.types.Operator ):
 
         # Reset all pose values
         for pose in book.poses:
-            pose['value'] = 0.0
-        
-        internal.update_combined_pose(book)
+            pose.reset_pose()
+                
         return {'FINISHED'}
 
 
@@ -1074,12 +1047,12 @@ def draw_pose_name_callback(self, context):
     blf.shadow_offset(font_id, 3, -3)
 
     # draw from bottom
-    blf.size(font_id, 24, 72)
+    blf.size(font_id, 24)
     blf.position(font_id, 15, y_pos, 0)
     blf.draw(font_id, f"Up/Down: Change Pose, Left/Right: Change Category")
     y_pos += y_step
 
-    blf.size(font_id, 30, 72)
+    blf.size(font_id, 30)
     blf.position(font_id, 15, y_pos, 0)
     if pose:
         blf.draw(font_id, f"PoseBook: {book.name}  Pose: {pose.name}")
@@ -1087,7 +1060,7 @@ def draw_pose_name_callback(self, context):
         blf.draw(font_id, f"PoseBook: {book.name}  Pose: None")
     y_pos += y_step
 
-    blf.size(font_id, 32, 72)
+    blf.size(font_id, 32)
     blf.position(font_id, 15, y_pos, 0)
     blf.draw(font_id, f"Pose Preview")
 
@@ -1131,9 +1104,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
                 # Apply the active pose			
                 book = spl.get_active_book()
                 pose = book.get_active_pose()
-                if pose:
-                    internal.apply_pose( pose, 1.0, reset_others=True )
-
+                book.apply_pose(pose)
 
                 return {'RUNNING_MODAL'}
             else:
@@ -1167,8 +1138,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
             return {'CANCELLED'}
         
         pose = book.get_active_pose()
-        if pose:
-            internal.apply_pose( pose, 1.0, reset_others=True )
+        book.apply_pose(pose)
 
         if context.area.type == 'VIEW_3D':
             context.window_manager.modal_handler_add(self)
@@ -1194,7 +1164,10 @@ class RenameOp:
     replace: bpy.props.StringProperty(name="Replace", default="")
     use_regex: bpy.props.BoolProperty(name="Use Regex", default=False)
 
+    all_books: bpy.props.BoolProperty(name="Process All PoseBooks", default=False)
+
     def draw_rename_options(self, layout: bpy.types.UILayout):
+        layout.prop(self, "all_books")
         box = layout.box()
         box.prop(self, "search")
         box.prop(self, "replace")
@@ -1209,6 +1182,15 @@ class RenameOp:
                 return tgt_str
         else:
             return tgt_str.replace(search, replace)
+
+    def invoke(self, context, event):
+        spl = get_poselib_from_context(context)
+        if self.all_books:
+            self.books = spl.books # All posebooks
+        else:
+            self.books = [spl.get_active_book()] # Only the active posebook
+        
+        return context.window_manager.invoke_props_dialog(self)
 
 
 # Operator: Batch Rename Poses in the PoseBook
@@ -1225,20 +1207,21 @@ class SPL_OT_BatchRenamePoses(bpy.types.Operator, RenameOp):
 
         self.draw_rename_options(layout)
 
+
     @classmethod
     @requires_active_posebook
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
     def execute(self, context):
-        spl = get_poselib_from_context(context)
-        book = spl.get_active_book()
 
-        for pose in book.poses:
-            newname = self.do_rename(pose.name, self.search, self.replace, self.use_regex)
-            pose.name = newname
-            if newname != pose.name:
-                self.report({'INFO'}, f"Pose '{pose.name}' renamed to '{newname}', by naming conflict")
+        for book in self.books:
+            for pose in book.poses:
+                newname = self.do_rename(pose.name, self.search, self.replace, self.use_regex)
+                pose.name = newname
+                if newname != pose.name:
+                    self.report({'INFO'}, f"Pose '{pose.name}' renamed to '{newname}', by naming conflict")
 
         self.report({'INFO'}, "Pose renaming completed")
         return {'FINISHED'}
@@ -1251,52 +1234,28 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator, RenameOp):
     bl_description = "Rename bones within all Pose Data in the active PoseBook (useful for retargeting)"
     bl_options = {'REGISTER', 'UNDO'}
 
-    all_books: bpy.props.BoolProperty(name="Process All PoseBooks", default=False)
-
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.prop(self, "all_books")
-
-        # Draw rename options
         self.draw_rename_options(layout)
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-
 
     @classmethod
     @requires_active_posebook
+    @requires_animation_disabled
     def poll(cls, context):
         return True
 
     def execute(self, context):
-        spl = get_poselib_from_context(context)
-
-        if self.all_books:
-            books = spl.books # All posebooks
-        else:
-            books = [spl.get_active_book()] # Only the active posebook
-
         # Iterate through posebooks
-        for posebook in books:
-            for pose in posebook.poses:
+        for book in self.books:
+            for pose in book.poses:
                 for bone_transform in pose.bones:
                     newname = self.do_rename(bone_transform.name, self.search, self.replace, self.use_regex)
                     bone_transform.name = newname
                     if newname != bone_transform.name:
                         self.report({'INFO'}, f"Bone '{bone_transform.name}' renamed to '{newname}', by naming conflict")
-                    
-                    # if self.use_regex:
-                    #     try:
-                    #         bone_transform.name = re.sub(self.search, self.replace, bone_transform.name)
-                    #     except re.error as e:
-                    #         self.report({'ERROR'}, f"Invalid regular expression: {e}")
-                    #         return {'CANCELLED'}
-                    # else:
-                    #     bone_transform.name = bone_transform.name.replace(self.search, self.replace)
 
         self.report({'INFO'}, "Batch renaming completed")
         return {'FINISHED'}

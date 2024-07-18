@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Panel
 from bpy.types import UIList
 
-from .props import get_poselib, get_poselib_from_context
+from .spl import get_poselib, get_poselib_from_context, get_armature_from_id
 from .poll_requirements import *
 
 # UIList for displaying the poses categories in Sakura Poselib
@@ -29,7 +29,18 @@ class SPL_UL_PoseBook(UIList):
 		sp.prop( item, 'name', text='', emboss=False )
 		if prefs.show_alt_pose_names:
 			sp.prop( item, 'name_alt', text='', emboss=True )
-		sp.prop( item, 'value', slider=True, text='' )
+
+		spl = get_poselib_from_context(context)
+		if spl.enable_animation:
+			arm = get_armature_from_id(item)
+			con_name = item.get('constraint_name', None)
+			if con_name and con_name in arm.keys():
+				sp.prop( arm, '["' + con_name + '"]', slider=True, text='' )
+			else:
+				sp.label(text="", icon='ERROR')
+		else:
+			sp.prop( item, 'value', slider=True, text='' )
+
 		#col = l.column(align=True)
 		#row = l.row(align=True)
 
@@ -88,7 +99,7 @@ class SPL_UL_BoneList(UIList):
 	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 		l:bpy.types.UILayout = layout
 		# Draw each item in the list as a label with the pose name
-		arm = item.id_data
+		arm = get_armature_from_id(item)
 		pbone = arm.pose.bones.get(item.name)
 
 		row = l.row(align=True)
@@ -165,7 +176,7 @@ class SPL_MT_PoseListDisplayMenu(bpy.types.Menu):
 		return
 
 # Panel drawer for Property Panel and 3D View Side Panel
-def draw_main_panel(self, context):
+def draw_main_panel(self, context: bpy.types.Context):
 	l:bpy.types.UILayout = self.layout
 
 	obj = context.object
@@ -183,8 +194,12 @@ def draw_main_panel(self, context):
 
 	# Draw the PoseBook list as a UIList, and add buttons for PoseBook operations
 	row = l.row(align=True)
+	row.alignment = 'LEFT'
 	row.label(text="PoseBooks:", icon='ASSET_MANAGER')
-	row.label(text=arm.name, icon='OUTLINER_OB_ARMATURE', translate=False )
+	col = row.column(align=True)
+	if arm.library or arm.override_library:
+		col.alert = True
+	col.label(text=arm.name, icon='OUTLINER_OB_ARMATURE', translate=False )
 
 	row = l.row( align=False )
 	row.template_list("SPL_UL_PoseCategoryList", "", spl, "books", spl, "active_book_index", rows=5)
@@ -198,7 +213,9 @@ def draw_main_panel(self, context):
 	row.separator()
 	# PoseBook submenu
 	row.menu( 'SPL_MT_PoseBookMenu', text='', icon='DOWNARROW_HLT')
-	
+
+	col = l.column(align=True)
+	col.prop(spl, 'enable_animation', expand=True, toggle=True, icon='ANIM')
 
 	# Draw the pose list as a UIList, and add buttons for pose operations
 	if book:
@@ -206,8 +223,8 @@ def draw_main_panel(self, context):
 		sp = l.split(factor=0.6, align=True)
 		row = sp.row(align=True)
 		row.alignment = 'LEFT'
-		row.label(text=book.name, translate=False, icon='POSE_HLT')
-		row.label(text="Poses:")
+		row.label(text="Poses:", icon='POSE_HLT')
+		row.label(text=book.name, translate=False)
 
 		prefs = bpy.context.preferences.addons[__package__].preferences
 		col = sp.column(align=True)
@@ -262,7 +279,7 @@ def draw_main_panel(self, context):
 
 	else:
 		l.label(text="No active PoseBook.", icon='INFO')
-		l.operator( 'spl.add_book', text='Add Pose List', icon='ADD')
+		l.operator( 'spl.add_book', icon='ADD')
 
 
 

@@ -7,57 +7,7 @@ import os
 from mathutils import Vector, Quaternion, Euler
 
 from . import mmd
-
-# pose categories definition
-POSE_CATEGORIES = [
-			("ALL", "All", "Show All"), 
-			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
-			("EYE", "Eye", "Show Eye Poses"),
-			("MOUTH", "Mouth", "Show Mouth Poses"), 
-			("OTHER", "Other", "Show Other Poses (Body, FX, etc)"),
-]
-
-
-# helper: check pose bone is visible
-def is_pose_bone_visible( pbone: bpy.types.PoseBone ) -> bool:
-	# check if bone is hidden
-	if pbone.bone.hide or pbone.bone.hide_select:
-		return False
-
-	# check if bone is in visible layer
-	arm = pbone.id_data
-	if bpy.app.version < (4,0,0): # 2.x~3.x
-		if not any(pbone.bone.layers[i] and arm.data.layers[i] for i in range(len(pbone.bone.layers))):
-			return False
-	else: # 4.x~
-		if not any(bcoll.is_visible for bcoll in pbone.bone.collections):
-			return False
-
-	return True
-
-# Get pose bone rotation in quaternion
-def get_pose_bone_rotation_quaternion( pose_bone: bpy.types.PoseBone ) -> Quaternion:
-	rotation_mode = pose_bone.rotation_mode
-
-	if rotation_mode == 'QUATERNION':
-		return pose_bone.rotation_quaternion.copy()
-	elif rotation_mode == 'AXIS_ANGLE':
-		return pose_bone.rotation_axis_angle.to_quaternion()
-	elif rotation_mode == 'XYZ':
-		return pose_bone.rotation_euler.to_quaternion()
-	elif rotation_mode == 'XZY':
-		return pose_bone.rotation_euler.to_quaternion()
-	elif rotation_mode == 'YXZ':
-		return pose_bone.rotation_euler.to_quaternion()
-	elif rotation_mode == 'YZX':
-		return pose_bone.rotation_euler.to_quaternion()
-	elif rotation_mode == 'ZXY':
-		return pose_bone.rotation_euler.to_quaternion()
-	elif rotation_mode == 'ZYX':
-		return pose_bone.rotation_euler.to_quaternion()
-	else:
-		print("Unknown rotation mode: ", rotation_mode)
-		return Quaternion()
+from . import spl
 
 
 # Extract pose data from pose library, returns list of poses
@@ -123,7 +73,7 @@ def extract_pose_library_data( armature: bpy.types.Object ):
 	return poses
 
 # Convert from Poselib (works on earlier than 3.4)
-def convert_from_poselib( book, remove_poselib = False ):
+def convert_from_poselib( book: spl.PoseBook, remove_poselib = False ):
 	armature = book.id_data
 
 	poselib = getattr( armature, 'pose_library' )
@@ -170,7 +120,7 @@ def convert_from_poselib( book, remove_poselib = False ):
 
 
 # Convert to Poselib (works on earlier than 3.4)
-def convert_to_poselib( book ):
+def convert_to_poselib( book: spl.PoseBook ):
 	armature = book.id_data
 
 	basename = book.name if book.name else armature.name
@@ -219,7 +169,7 @@ def convert_to_poselib( book ):
 
 
 # Load from mmd_tools' bone morph
-def load_poses_from_mmdtools( book ):
+def load_poses_from_mmdtools( book: spl.PoseBook ):
 	armature = book.id_data
 	root = mmd.get_model_root( armature )
 	if not root:
@@ -233,10 +183,10 @@ def load_poses_from_mmdtools( book ):
 
 	# Read bone morphs and convert to Sakura Poselib' pose	
 	for morph in bone_morphs:
-		pose_data = book.poses.add()
-		pose_data.name = morph.name
+		pose: spl.PoseData = book.poses.add()
+		pose.name = morph.name
 		for bone_name, rotation, location in morph.data:
-			bd = pose_data.bones.add()
+			bd = pose.bones.add()
 			bd.name = bone_name
 			bd.location = location
 			bd.rotation = rotation
@@ -245,7 +195,7 @@ def load_poses_from_mmdtools( book ):
 
 
 # Convert to MMD Tools' Bone Morph
-def convert_poses_to_mmdtools( book, use_alt_pose_names=False, clear_exsisting=False ):
+def convert_poses_to_mmdtools( book: spl.PoseBook, use_alt_pose_names=False, clear_exsisting=False ):
 	armature = book.id_data
 	root = mmd.get_model_root( armature )
 	if not root:
@@ -290,7 +240,7 @@ def convert_poses_to_mmdtools( book, use_alt_pose_names=False, clear_exsisting=F
 # Json format
 import json
 # Save PoseBook into a file (JSON)
-def save_book_to_json( book, filepath ):
+def save_book_to_json( book: spl.PoseBook, filepath ):
 	poses = book.poses
 
 	# Convert to JSON
@@ -338,7 +288,7 @@ def guess_pose_category( pose_name ):
 
 
 # Load PoseBook from a file (JSON)
-def load_book_from_json( book, filepath ):
+def load_book_from_json( book: spl.PoseBook, filepath ):
 	poses = book.poses
 
 	poses.clear()
@@ -376,7 +326,7 @@ _POSE_CATEGORIES = [
 
 
 # Save PoseBook into a file (CSV)
-def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
+def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
 	poses = book.poses
 	obj: bpy.types.Object = book.id_data
 	arm: bpy.types.Armature = obj.data
@@ -458,7 +408,7 @@ def save_book_to_csv( book, filename, scale=12.5, use_mmd_bone_names=True, use_a
 
 
 # Load PoseBook from a file (CSV)
-def load_book_from_csv( book, filename, scale=0.08 ):
+def load_book_from_csv( book: spl.PoseBook, filename, scale=0.08 ):
 	poses = book.poses
 	obj: bpy.types.Object = book.id_data
 	poses = book.poses
@@ -571,104 +521,3 @@ def load_book_from_csv( book, filename, scale=0.08 ):
 	return
 
 
-
-
-
-# Apply Single Pose 
-def apply_pose( pose_data, influence = 1.0, reset_others = False, additive = False ):
-	if not pose_data:
-		return
-
-	arm:bpy.types.Object = pose_data.id_data
-
-	zero_loc = Vector((0.0,0.0,0.0))
-	zero_rot = Quaternion((1.0,0.0,0.0,0.0))
-	zero_sca = Vector((1.0,1.0,1.0))
-
-	# Backup rotation modes
-	rot_modes = {}
-	for bone in arm.pose.bones:
-		rot_modes[bone] = bone.rotation_mode
-		bone.rotation_mode = 'QUATERNION'
-
-	# Reset other bones
-	if reset_others:
-		for bone in arm.pose.bones:
-			bone.location = zero_loc
-			bone.rotation_quaternion = zero_rot
-			bone.scale = zero_sca
-
-	for bone_data in pose_data.bones:
-		bone = arm.pose.bones.get(bone_data.name)
-		if not bone:
-			continue
-
-		# Convert into Blender's coordinate system
-		loc_diff = Vector( bone_data.location ) * influence
-		rot_diff = Quaternion( bone_data.rotation ) * influence
-		sca_diff = ( Vector( bone_data.scale ) - Vector((1.0,1.0,1.0))) * influence
-
-		# Apply pose
-		if not additive: # Replace Transform
-			bone.location = loc_diff
-			bone.rotation_quaternion = rot_diff
-			bone.scale = sca_diff + Vector((1.0,1.0,1.0))
-
-		else: # Additive Transform
-			bone.location = bone.location + loc_diff
-			bone.rotation_quaternion = bone.rotation_quaternion.slerp( bone_data.rotation, influence )
-			bone.scale = bone.scale + sca_diff
-
-		# restore rotation mode
-		bone.rotation_mode = rot_modes[bone]
-
-	return
-
-
-
-# Update Combined Pose
-def update_combined_pose( book ):
-	if not book:
-		return
-	
-	arm = book.id_data
-
-	accum_dic = {} # {bone_name: (loc, rot, sca)}
-	zero_vector = Vector((0,0,0))
-	ident_quat = Quaternion((1,0,0,0))
-	zero_euler = Euler((0,0,0))
-	ident_scale = Vector((1,1,1))
-
-	# accumulate all influences of poses
-	for pose in book.poses:
-		influence = pose.value
-		for bone_data in pose.bones:
-			if bone_data.name not in accum_dic:
-				accum_dic[bone_data.name] = [zero_vector.copy(), zero_euler.copy(), ident_scale.copy()]
-
-			loc, rot, sca = accum_dic[bone_data.name]
-
-			if bone_data.location.length != 0.0:
-				loc += bone_data.location * influence
-
-			if bone_data.rotation != ident_quat:
-				euler = bone_data.rotation.to_euler()
-				rot.x += euler.x * influence
-				rot.y += euler.y * influence
-				rot.z += euler.z * influence
-
-			if bone_data.scale != ident_scale:
-				sca += (bone_data.scale - ident_scale) * influence
-
-	# apply accumulated values to bones
-	for bone_name, (loc, rot, sca) in accum_dic.items():
-		pbone = arm.pose.bones.get(bone_name)
-		if pbone:
-			org_rotation_mode = pbone.rotation_mode
-			pbone.rotation_mode = 'QUATERNION'
-			pbone.location = loc
-			pbone.rotation_quaternion = rot.to_quaternion()
-			pbone.scale = sca
-			pbone.rotation_mode = org_rotation_mode
-
-	return

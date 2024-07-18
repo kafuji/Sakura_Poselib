@@ -15,7 +15,7 @@ Category	English	Japanese
 *	Developer Settings	開発者設定
 *	Developer Mode	開発者モード
 
-
+*	Make this Poselib animatable/keyable. Pose editing will be disabled in this mode	このPoselibをアニメーション可能/キーフレーム可能にします。このモードではポーズ編集が無効になります
 *	PoseBook	ポーズブック
 
 O	Load from Pose Library	ポーズライブラリから読み込み
@@ -63,7 +63,8 @@ O	Save to CSV	CSVファイルに書き出し
 *	Pose Bone Data	ポーズのボーンデータ：
 *	Book Name	ブック名：
 
-
+*	No model selected.	モデルが選択されていません。
+*	No active PoseBook.	アクティブなポーズブックがありません。
 *	No active pose.	アクティブなポーズがありません。
 
 O	Add PoseBook	ポーズブックを追加
@@ -86,8 +87,10 @@ O	Apply Pose	ポーズを適用
 O	Add Pose	ポーズを追加
 *	Add a new pose from the current armature pose	アーマチュアの現在のポーズから新しいポーズを追加します
 
-*	Only Visible Bones	表示されているボーンのみ
+*	Ignore Hidden Bones	非表示ボーンを無視
 *	Evaluate only bones visible in the viewport	ビューポートで表示されているボーンのみ評価します
+*	Ignore Driven Bones	被ドライブボーンを無視
+*	Evaluate only bones which transforms are not controlled by drivers	変形がドライバーによって制御されていないボーンのみ評価します
 
 O	Replace Pose	ポーズを置き換え
 *	Replace the selected pose with the current armature pose (overwrite)	選択ポーズをアーマチュアの現在のポーズで上書きし、置き換えます
@@ -126,7 +129,9 @@ O	Reset PoseBook	ポーズブックをリセット
 *	Reset all pose values to zero in the PoseBook	ポーズブックのすべてのポーズ値をゼロにリセットします
 
 O	Add Selected Bone to Pose	選択したボーンをポーズに追加
+*	Add selected bones to the active pose. You can edit transfrom values manually	選択したボーンをアクティブなポーズに追加します。変形値を手動で編集できます
 O	Remove Bone from Pose	ポーズからボーンを削除
+*	Remove the selected bone from the active pose	選択したボーンをアクティブなポーズから削除します
 
 *	Sakura Poselib Pose Preview	Sakura Poselibポーズプレビュー
 *	PoseLib Converter	Poselibコンバーター
@@ -141,7 +146,7 @@ O	Batch Rename Bones	ボーンを一括リネーム
 *	Process All PoseBooks	すべてのポーズブックを処理
 
 
-*	Import/Export	インポート/エクスポート
+*	Import / Export	インポート/エクスポート
 *	Batch Operations	一括操作
 
 

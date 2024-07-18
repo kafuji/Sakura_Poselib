@@ -3,14 +3,18 @@
 
 import bpy
 from bpy.app.handlers import persistent
-from .props import get_poselib
+from .spl import get_poselib, ensure_proxy_obj
 
 # Msgbus handlers
 def on_bone_rename( *args ):
-    print( 'on_bone_rename', args )
+    #print( 'on_bone_rename', args )
 
     # find renamed bones and update bone name backup
     for arm in [o for o in bpy.data.objects if o.pose]:
+        # skip if armature is library or override (prohibited to edit)
+        if arm.data.library or arm.data.override_library:
+            continue
+
         plp = get_poselib(arm)
         if plp is None:
             continue
@@ -52,6 +56,19 @@ def unregister_msgbus():
 
 # Timer handler
 def timed_handler_every_second():
+    # ensure proxy object for library linked armature
+    for arm in [o for o in bpy.data.objects if o.pose]:
+        if arm.data.library or arm.data.override_library:
+            ensure_proxy_obj(arm)
+        
+        # ensure actions for each book
+        plp = get_poselib(arm)
+        if plp is None:
+            continue
+
+        plp.ensure_actions()
+
+
     #print('timed_handler_every_second')
     return 1.0
 
@@ -62,6 +79,10 @@ def timed_handler_every_second():
 def on_load(dummy):
     # create bone name backup
     for arm in bpy.data.armatures:
+        # skip if armature is library or override (prohibited to edit)
+        if arm.library or arm.override_library:
+            continue
+
         for bone in arm.bones:
             bone['spl_bone_name_backup'] = bone.name
 

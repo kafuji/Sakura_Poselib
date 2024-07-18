@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "Sakura PoseLib",
 	"author": "Kafuji Sato",
-	"version": (1, 1, 1),
+	"version": (1, 2, 0),
 	"blender": (2, 93, 0),
 	"location": "Armature Properties > Sakura PoseLib / Side Panel -> Sakura",
 	"description": "Yet another pose library with handful of features",
@@ -14,7 +14,7 @@ bl_info = {
 module_names = [
 	"translation",
 	"prefs",
-	"props",
+	"spl",
 	"ops",
 	"panel",
 	"menu",

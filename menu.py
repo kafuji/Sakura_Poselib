@@ -2,7 +2,7 @@
 
 import bpy
 from bpy.types import Menu
-from .props import get_poselib_from_context
+from .spl import get_poselib_from_context
 
 # Main Menu in Pose Mode
 class SPL_MT_PoseMenu(Menu):

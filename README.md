@@ -18,6 +18,13 @@
 
 ## Change Log
 
+- 2024/07/18: v1.2.0
+  - Added Animation Mode to support using Poselib with Blender's animation system.
+    - To use it, press 'Enable Animation' button in the Book list panel.
+  - Added support for Linked Library Armature object.
+    - Now you can use Poselib with linked library armature object.
+  - Minor bugfixes and feature improvements.
+
 - 2024/07/16: v1.1.1
   - Pose List:
     - Added 'Duplicate Pose' function.

@@ -1,5 +1,5 @@
 import bpy
-from .props import get_poselib_from_context
+from .spl import get_poselib_from_context
 
 # Wrappers for operator poll
 from functools import wraps
@@ -7,17 +7,23 @@ def requires_active_armature(func):
     """Check if the active object is an armature"""
     @wraps(func)
     def wrapper(cls, context):
-        if not context.object or not context.object.pose:
-            return False
-        
-        # Check if the object is library or override library
-        obj = context.object
-        if obj.library or obj.override_library:
+        spl = get_poselib_from_context(context)
+        if not spl:
             return False
 
         return func(cls, context)
     return wrapper
 
+def requires_animation_disabled(func):
+    """Check if the active object is not in animation mode"""
+    @wraps(func)
+    def wrapper(cls, context):
+        spl = get_poselib_from_context(context)
+        if spl.enable_animation:
+            return False
+
+        return func(cls, context)
+    return wrapper
 
 def requires_active_posebook(func):
     """Check if the active posebook exists"""
