@@ -9,6 +9,7 @@
 - Adds simple and handy pose libraries to armatures.
 - Quickly add/update/preview poses form context menu.
 - Blend multiple poses with sliders.
+- Supports Blender's animation system. Keyframe your poses to make character animations!
 - Compatible with mmd_tools, PMX Editor via import/export functions.
 
 ## Online Document
