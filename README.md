@@ -19,6 +19,10 @@
 
 ## Change Log
 
+- 2024/07/19: v1.2.1
+  - Sakura Poselib panel was shown on object data tab other than Armature data (eg. Mesh data tab). It is now only on Armature data tab.
+- Added 'bl_ext.blender_org.mmd_tools' to check mmd_tools, to work in Blender 4.2.
+
 - 2024/07/18: v1.2.0
   - Added Animation Mode to support using Poselib with Blender's animation system.
     - To use it, press 'Enable Animation' button in the Book list panel.

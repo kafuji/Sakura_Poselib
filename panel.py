@@ -214,73 +214,76 @@ def draw_main_panel(self, context: bpy.types.Context):
 	# PoseBook submenu
 	row.menu( 'SPL_MT_PoseBookMenu', text='', icon='DOWNARROW_HLT')
 
-	col = l.column(align=True)
-	col.prop(spl, 'enable_animation', expand=True, toggle=True, icon='ANIM')
 
-	# Draw the pose list as a UIList, and add buttons for pose operations
-	if book:
-		row = l.row(align=True)
-		sp = l.split(factor=0.6, align=True)
-		row = sp.row(align=True)
-		row.alignment = 'LEFT'
-		row.label(text="Poses:", icon='POSE_HLT')
-		row.label(text=book.name, translate=False)
-
-		prefs = bpy.context.preferences.addons[__package__].preferences
-		col = sp.column(align=True)
-		col.alignment = 'RIGHT'
-		row = col.row(align=True)
-		row.alignment = 'RIGHT'
-		row.label(text="Display Settings:")
-		row.prop(prefs, 'show_alt_pose_names', toggle=True, icon='TEXT', text='')
-		row.prop(prefs, 'show_apply_buttons', toggle=True, icon='VIEWZOOM', text='')
-		row.prop(prefs, 'show_select_bones_buttons', toggle=True, icon='RESTRICT_SELECT_OFF', text='')
-		row.prop(prefs, 'show_replace_buttons', toggle=True, icon='GREASEPENCIL', text='')
-
-
-		#col.prop(book, 'show_alt_pose_names', toggle=True, icon='TEXT')
-
-		row = l.row()
-		row.prop(book, 'category_filter', expand=True)
-		
-		row = l.row()
-		row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=9)
-
-		col = row.column(align=True)
-		col.operator('spl.add_pose', text="", icon='ADD')
-		col.operator('spl.remove_pose', text="", icon='REMOVE')
-
-		col.separator()
-
-		# Up/Down buttons for moving poses in the list
-		col.operator('spl.move_pose', text="", icon='TRIA_UP').direction = 'UP'
-		col.operator('spl.move_pose', text="", icon='TRIA_DOWN').direction = 'DOWN'
-
-		# Top and Bottom buttons for moving poses to the top or bottom of the list
-		col.separator()
-		col.operator('spl.move_pose', text="", icon='TRIA_UP_BAR').direction = 'TOP'
-		col.operator('spl.move_pose', text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
-
-		# Duplicate pose button
-		col.separator()
-		col.operator('spl.duplicate_pose', text="", icon='DUPLICATE')
-
-		col.separator()
-		col.operator('spl.reset_book_values', text="", icon='X')
-		col.separator()
-		col.menu( 'SPL_MT_PoseListMenu', text='', icon='DOWNARROW_HLT')
-
-		# Rest poses in the book button
-		col = l.column(align=True)
-		row = col.row(align=False)
-		row.operator( 'spl.apply_pose', icon='VIEWZOOM').pose_index = -1 # apply single pose
-		row.operator( 'spl.replace_pose', icon='GREASEPENCIL').pose_index = -1 # replace pose data with current pose
-
-
-	else:
+	# Draw add pose button when no active PoseBook
+	if not book:
 		l.label(text="No active PoseBook.", icon='INFO')
 		l.operator( 'spl.add_book', icon='ADD')
+		return
 
+	# Draw the pose list as a UIList, and add buttons for pose operations
+	col = l.column(align=True)
+	l.enabled = book.poses is not None
+	col.prop(spl, 'enable_animation', expand=True, toggle=True, icon='ANIM')
+
+	row = l.row(align=True)
+	sp = l.split(factor=0.6, align=True)
+	row = sp.row(align=True)
+	row.alignment = 'LEFT'
+	row.label(text="Poses:", icon='POSE_HLT')
+	row.label(text=book.name, translate=False)
+
+	prefs = bpy.context.preferences.addons[__package__].preferences
+	col = sp.column(align=True)
+	col.alignment = 'RIGHT'
+	row = col.row(align=True)
+	row.alignment = 'RIGHT'
+	row.label(text="Display Settings:")
+	row.prop(prefs, 'show_alt_pose_names', toggle=True, icon='TEXT', text='')
+	row.prop(prefs, 'show_apply_buttons', toggle=True, icon='VIEWZOOM', text='')
+	row.prop(prefs, 'show_select_bones_buttons', toggle=True, icon='RESTRICT_SELECT_OFF', text='')
+	row.prop(prefs, 'show_replace_buttons', toggle=True, icon='GREASEPENCIL', text='')
+
+
+	#col.prop(book, 'show_alt_pose_names', toggle=True, icon='TEXT')
+
+	row = l.row()
+	row.prop(book, 'category_filter', expand=True)
+	
+	row = l.row()
+	row.template_list("SPL_UL_PoseBook", "", book, "poses", book, "active_pose_index", rows=9)
+
+	col = row.column(align=True)
+	col.operator('spl.add_pose', text="", icon='ADD')
+	col.operator('spl.remove_pose', text="", icon='REMOVE')
+
+	col.separator()
+
+	# Up/Down buttons for moving poses in the list
+	col.operator('spl.move_pose', text="", icon='TRIA_UP').direction = 'UP'
+	col.operator('spl.move_pose', text="", icon='TRIA_DOWN').direction = 'DOWN'
+
+	# Top and Bottom buttons for moving poses to the top or bottom of the list
+	col.separator()
+	col.operator('spl.move_pose', text="", icon='TRIA_UP_BAR').direction = 'TOP'
+	col.operator('spl.move_pose', text="", icon='TRIA_DOWN_BAR').direction = 'BOTTOM'
+
+	# Duplicate pose button
+	col.separator()
+	col.operator('spl.duplicate_pose', text="", icon='DUPLICATE')
+
+	col.separator()
+	col.operator('spl.reset_book_values', text="", icon='X')
+	col.separator()
+	col.menu( 'SPL_MT_PoseListMenu', text='', icon='DOWNARROW_HLT')
+
+	# Rest poses in the book button
+	col = l.column(align=True)
+	row = col.row(align=False)
+	row.operator( 'spl.apply_pose', icon='VIEWZOOM').pose_index = -1 # apply single pose
+	row.operator( 'spl.replace_pose', icon='GREASEPENCIL').pose_index = -1 # replace pose data with current pose
+
+	return
 
 
 
@@ -295,9 +298,8 @@ class SPL_PT_PoseLibPropPanel(Panel):
 
 	# Only show the panel when an armature object is selected
 	@classmethod
-	@requires_active_armature
 	def poll(cls, context):
-		return True
+		return context.object and context.object.pose
 
 	def draw(self, context):
 		draw_main_panel(self, context)

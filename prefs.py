@@ -3,17 +3,15 @@
 import bpy
 from bpy.props import *
 
-DEV_MODE = True
-
 # Addon Preferences
 class SPL_Preferences(bpy.types.AddonPreferences):
     bl_idname = __package__
 
-    dev_mode : bpy.props.BoolProperty(
-        name = 'Developer Mode',
-        description = 'Show developer UI items',
-        default = DEV_MODE,
-    )
+    # dev_mode : bpy.props.BoolProperty(
+    #     name = 'Developer Mode',
+    #     description = 'Show developer UI items',
+    #     default = DEV_MODE,
+    # )
 
     show_alt_pose_names: BoolProperty(
 		name="Show Alt Names",
@@ -58,10 +56,9 @@ class SPL_Preferences(bpy.types.AddonPreferences):
         # box.prop(self, "show_replace_buttons", icon='GREASEPENCIL')
 
         # Developer Settings
-        box = layout.box()
-        box.label(text="Developer Settings")
-        box.prop(self, "dev_mode")
-
+        # box = layout.box()
+        # box.label(text="Developer Settings")
+        # box.prop(self, "dev_mode")
 
         return
 

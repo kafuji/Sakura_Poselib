@@ -692,11 +692,11 @@ class PoselibData(PropertyGroup):
 			update_combined_pose(self.get_active_book())
 
 		return
-	
+
 	enable_animation: BoolProperty(
-		name="Enable Animation", 
-		description="Make this Poselib animatable/keyable. Pose editing will be disabled in this mode",
-		default=False, 
+		name="Enable Animation",
+		description= "Make this Poselib animatable/keyable. Pose editing will be disabled in this mode. Armature bones will be constrained by Actions",
+		default=False,
 		update=on_enable_animation_update,
 		override={'LIBRARY_OVERRIDABLE'},
 	)

@@ -14,7 +14,8 @@ def get_model_root(obj: bpy.types.Object) -> bpy.types.Object:
 
 # Check if mmd_tools is installed
 def is_mmd_tools_installed():
-	return bpy.context.preferences.addons.get("mmd_tools")
+    addons = bpy.context.preferences.addons
+    return 'mmd_tools' in addons or 'bl_ext.blender_org.mmd_tools' in addons # legacy and new from Blender 4.2
 
 
 # Get mmd_bone.name and name_e

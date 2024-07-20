@@ -15,7 +15,8 @@ Category	English	Japanese
 *	Developer Settings	開発者設定
 *	Developer Mode	開発者モード
 
-*	Make this Poselib animatable/keyable. Pose editing will be disabled in this mode	このPoselibをアニメーション可能/キーフレーム可能にします。このモードではポーズ編集が無効になります
+*	Make this Poselib animatable/keyable. Pose editing will be disabled in this mode. Armature bones will be constrained by Actions	このPoselibをアニメーション可能/キーフレーム可能にします。このモードではポーズ編集が無効になります。アーマチュアボーンはアクションによって制約されます
+
 *	PoseBook	ポーズブック
 
 O	Load from Pose Library	ポーズライブラリから読み込み
