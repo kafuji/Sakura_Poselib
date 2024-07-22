@@ -441,6 +441,9 @@ class SPL_OT_AddPose( bpy.types.Operator ):
             ignore_driven_bones=self.ignore_driven_bones
         )
 
+        # make visible in the viewport
+        book.apply_single_pose(new_pose)
+
         # Place the new pose in the PoseBook
         if self.placement == 'APPEND':
             book.active_pose_index = len(book.poses) - 1
@@ -451,6 +454,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         elif self.placement == 'PREPEND':
             book.poses.move(len(book.poses) - 1, 0) # this breaks new_pose reference
             book.active_pose_index = 0
+        
 
         return {'FINISHED'}
 
@@ -486,7 +490,6 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
         # print("Replace Pose", self.pose_index)
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        arm = spl.get_armature()
 
         # Get the target pose, if pose_index is negative, use the active pose
         pose_index = self.pose_index if self.pose_index >= 0 else book.active_pose_index
@@ -502,6 +505,9 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
             ignore_hidden_bones=self.ignore_hidden_bones, 
             ignore_driven_bones=self.ignore_driven_bones
         )
+
+        # make visible in the viewport
+        book.apply_single_pose(target_pose)
 
         return {'FINISHED'}
 
@@ -533,6 +539,9 @@ class SPL_OT_DuplicatePose(bpy.types.Operator):
         new_pose.name = active_pose.name + "+"
         new_pose.name_alt = active_pose.name_alt + "+"
 
+        # make visible in the viewport
+        book.apply_single_pose(new_pose)
+
         # Move the new pose to the position right after the active pose
         new_index = book.active_pose_index + 1
         book.poses.move(len(book.poses) - 1, new_index) # this breaks new_pose reference
@@ -561,6 +570,9 @@ class SPL_OT_RemovePose(bpy.types.Operator):
 
         # Remove the active pose from the poses collection
         book.remove_pose_by_index(book.active_pose_index)
+
+        # make visible
+        book.apply_poses()
 
         return {'FINISHED'}
 
@@ -936,6 +948,11 @@ class SPL_OT_MovePose( bpy.types.Operator ):
         )
     )
 
+    @classmethod
+    @requires_active_pose
+    def poll(cls, context):
+        return True
+
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
@@ -1017,9 +1034,8 @@ class SPL_OT_ResetPoseBookValues( bpy.types.Operator ):
         book = spl.get_active_book()
 
         # Reset all pose values
-        for pose in book.poses:
-            pose.reset_pose()
-                
+        book.reset_poses()
+
         return {'FINISHED'}
 
 
@@ -1038,7 +1054,7 @@ def draw_pose_name_callback(self, context):
 
     font_id = 0  # default font
 
-    y_pos = 24
+    y_pos = 48
     y_step = 32
 
     # draw pose name
@@ -1104,7 +1120,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
                 # Apply the active pose			
                 book = spl.get_active_book()
                 pose = book.get_active_pose()
-                book.apply_pose(pose)
+                book.apply_single_pose(pose)
 
                 return {'RUNNING_MODAL'}
             else:
@@ -1138,7 +1154,7 @@ class POSELIBPLUS_OT_pose_preview( bpy.types.Operator ):
             return {'CANCELLED'}
         
         pose = book.get_active_pose()
-        book.apply_pose(pose)
+        book.apply_single_pose(pose)
 
         if context.area.type == 'VIEW_3D':
             context.window_manager.modal_handler_add(self)

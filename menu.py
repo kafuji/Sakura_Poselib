@@ -11,7 +11,7 @@ class SPL_MT_PoseMenu(Menu):
 
 	def draw(self, context):
 		layout = self.layout
-		layout.operator("spl.add_pose", text="New")
+		layout.operator("spl.add_pose", text="Add Pose")
 
 		spl = get_poselib_from_context(context)
 		book = spl.get_active_book()
@@ -20,7 +20,7 @@ class SPL_MT_PoseMenu(Menu):
 
 		pose = book.get_active_pose()
 		if pose:
-			layout.operator("spl.replace_pose", text=f"Replace '{pose.name}'").pose_index = -1
+			layout.operator("spl.replace_pose", text=bpy.app.translations.pgettext("Replace") + " " + pose.name).pose_index = -1
 		if len(book.poses):
 			layout.menu("SPL_MT_ReplacePoseMenu", text="Replace...")
 

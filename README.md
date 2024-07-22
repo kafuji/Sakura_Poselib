@@ -19,6 +19,16 @@
 
 ## Change Log
 
+- 2024/07/22: v1.2.2
+- Add/Replace/Duplicate Pose:
+  - Fixed errors when adding / replacing pose on a armature without animation_data.
+  - Automatically makes new/target pose applied after operator is executed.
+- General:
+  - Automatically update current pose to match pose values when changing active pose book in Poselib.
+  - In Pose list, `Move Pose` operator is now disabled when there's no active pose.
+  - Tweaked Pose Preview overlay text position to better visibility.
+  - Better language translation for Add/Replace pose context menu.
+
 - 2024/07/19: v1.2.1
   - Sakura Poselib panel was shown on object data tab other than Armature data (eg. Mesh data tab). It is now only on Armature data tab.
 - Added 'bl_ext.blender_org.mmd_tools' to check mmd_tools, to work in Blender 4.2.

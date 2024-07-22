@@ -288,7 +288,7 @@ class PoseData(PropertyGroup):
 
 		# Get valid data paths for driven bones
 		valid_datapaths = []	
-		if ignore_driven_bones:
+		if ignore_driven_bones and arm.animation_data:
 			for fc in arm.animation_data.drivers:
 				if not fc.is_valid:
 					continue
@@ -632,11 +632,13 @@ class PoseBook(PropertyGroup):
 			self.active_pose_index -= 1
 		if self.active_pose_index < 0:
 			self.active_pose_index = 0
+		return
 
 	def remove_pose(self, pose: PoseData):
 		index = self.poses.find(pose.name)
 		if index >= 0:
 			self.remove_pose_by_index(index)
+		return
 	
 	# Copy entire data from another PoseBook
 	def copy_from(self, src: "PoseBook"):
@@ -648,27 +650,51 @@ class PoseBook(PropertyGroup):
 		self.active_pose_index = src.active_pose_index
 		self.category_filter = src.category_filter
 		self.show_alt_pose_names = src.show_alt_pose_names
+		return
 	
 	# Apply single pose
-	def apply_pose(self, pose: PoseData):
+	def apply_single_pose(self, pose: PoseData):
 		for p in self.poses:
+			p: PoseData
 			if p == pose:
 				p.apply_pose()
 			else:
 				p.reset_pose()
 		return
+	
+	# Applly entire book
+	def apply_poses(self, reset_current_pose: bool = True):
+		if reset_current_pose:
+			arm = get_armature_from_id(self)
+			armature_reset_pose(arm)
+		update_combined_pose(self)
+		return
 
+	# Reset entire book
+	def reset_poses(self):
+		for pose in self.poses:
+			pose: PoseData
+			pose.reset_pose()
+		return
 
 
 # Root Container
 class PoselibData(PropertyGroup):
 	books: CollectionProperty(
-		type=PoseBook, 
-		override={'LIBRARY_OVERRIDABLE', 'USE_INSERTION'},
+		type = PoseBook, 
+		override = {'LIBRARY_OVERRIDABLE', 'USE_INSERTION'},
 	) # PoseBooks
 
+	# callback for active book index change
+	def on_update_active_book_index(self, context):
+		# apply new book
+		book = self.get_active_book()
+		if book:
+			book.apply_poses()
+
 	active_book_index: IntProperty(
-		override={'LIBRARY_OVERRIDABLE'},
+		override = {'LIBRARY_OVERRIDABLE'},
+		update = on_update_active_book_index,
 	)
 
 	# controller name generator
