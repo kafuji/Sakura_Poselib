@@ -79,6 +79,7 @@ def update_combined_pose( book: "PoseBook" ):
 	ident_scale = Vector((1,1,1))
 
 	# accumulate all influences of poses
+	book: PoseBook
 	pose: PoseData
 	for pose in book.poses:
 		influence = pose.value
@@ -86,6 +87,9 @@ def update_combined_pose( book: "PoseBook" ):
 		for bone_data in pose.bones:
 			if bone_data.name not in accum_dic:
 				accum_dic[bone_data.name] = [zero_vector.copy(), zero_euler.copy(), ident_scale.copy()]
+
+			if influence == 0.0:
+				continue
 
 			loc, rot, sca = accum_dic[bone_data.name]
 
@@ -678,7 +682,8 @@ class PoseBook(PropertyGroup):
 		return
 
 
-# Root Container
+
+# Root PoseLib Container
 class PoselibData(PropertyGroup):
 	books: CollectionProperty(
 		type = PoseBook, 
@@ -690,7 +695,7 @@ class PoselibData(PropertyGroup):
 		# apply new book
 		book = self.get_active_book()
 		if book:
-			book.apply_poses()
+			book.apply_poses( reset_current_pose = False )
 
 	active_book_index: IntProperty(
 		override = {'LIBRARY_OVERRIDABLE'},

@@ -19,6 +19,10 @@
 
 ## Change Log
 
+- 2024/08/03: v1.2.3
+  - Fixed: Creating new posebook no longer reset current pose.
+  - Optimized internal pose data handling.
+
 - 2024/07/22: v1.2.2
 - Add/Replace/Duplicate Pose:
   - Fixed errors when adding / replacing pose on a armature without animation_data.
