@@ -408,7 +408,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
             ('APPEND', "Append", "Append the new pose at the end of the PoseBook"),
             ('PREPEND', "Prepend", "Prepend the new pose at the beginning of the PoseBook"),
         ),
-        default='INSERT'
+        default='APPEND'
     )
 
 
