@@ -5,6 +5,7 @@ import math
 import os
 
 from mathutils import Vector, Quaternion, Euler
+from numpy import mat
 
 from . import mmd
 from . import spl
@@ -347,7 +348,8 @@ def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_nam
 	converter_cache = {}
 	def _get_converter(b):
 		if b not in converter_cache:
-			converter_cache[b] = bone_util_cls(_PoseBone(b), scale, invert=True)
+			world_scale = matrix_world.to_scale()
+			converter_cache[b] = bone_util_cls(_PoseBone(b), scale * world_scale, invert=True)
 		return converter_cache[b]
 
 
