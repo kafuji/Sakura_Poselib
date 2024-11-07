@@ -19,6 +19,13 @@
 
 ## Change Log
 
+- 2024/11/07: v.1.2.4
+  - Save to JSON: Added the "Use Armature Space" option to save poses in armature space (default is True).
+    - When enabled, bone transforms are saved in armature space, which is useful for sharing poses across different armatures with varying bone rolls.
+    - When disabled, bone transforms are saved in bone local space, matching previous versions (Blender’s default behavior).
+  - Load from JSON/CSV: Removed the automatic category-setting behavior for loading poses.
+  - PoseBook menu: Tweaked for more usability.
+
 - 2024/08/03: v1.2.3
   - Fixed: Creating new posebook no longer reset current pose.
   - Optimized internal pose data handling.

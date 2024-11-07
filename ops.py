@@ -133,6 +133,12 @@ class SPL_OT_SaveToJson( bpy.types.Operator, ExportHelper ):
     filter_glob: StringProperty(default="*.json", options={'HIDDEN'})
     filename_ext = '.json'
 
+    use_armature_space: BoolProperty(
+        name="Use Armature Space",
+        description="Save transforms in armature space instead of bone local space. Making it compatible with armature with different bone rolls",
+        default = True,
+    )
+
     @classmethod
     @requires_poses
     def poll(cls, context):
@@ -143,7 +149,7 @@ class SPL_OT_SaveToJson( bpy.types.Operator, ExportHelper ):
         arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        self.filepath = arm.name + "_posebook_" + book.name
+        self.filepath = arm.name + "_posebook_" + book.name + ("(arm_space)" if self.use_armature_space else "")
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
@@ -152,7 +158,7 @@ class SPL_OT_SaveToJson( bpy.types.Operator, ExportHelper ):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
         # Save poses to file
-        internal.save_book_to_json(book, self.filepath)
+        internal.save_book_to_json(book, self.filepath, self.use_armature_space)
 
         return {'FINISHED'}
 

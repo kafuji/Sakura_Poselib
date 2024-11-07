@@ -4,10 +4,9 @@ import bpy
 import math
 import os
 
-from mathutils import Vector, Quaternion, Euler
-from numpy import mat
+from mathutils import Vector, Quaternion, Euler, Matrix
 
-from . import mmd
+from . import mmd, utils
 from . import spl
 
 
@@ -238,42 +237,13 @@ def convert_poses_to_mmdtools( book: spl.PoseBook, use_alt_pose_names=False, cle
 	return
 
 
-# Json format
-import json
-# Save PoseBook into a file (JSON)
-def save_book_to_json( book: spl.PoseBook, filepath ):
-	poses = book.poses
-
-	# Convert to JSON
-	data = []
-	for pose in poses:
-		pose_data = {
-			'name' : pose.name,
-			'name_alt' : pose.name_alt,
-			'category' : pose.category,
-			'bones' : [],
-		}
-		for bone_data in pose.bones:
-			bd = {
-				'name' : bone_data.name,
-				'location' : bone_data.location[:],
-				'rotation' : bone_data.rotation[:],
-			}
-			pose_data['bones'].append(bd)
-		data.append(pose_data)
-	
-	# Save to file
-	with open(filepath, 'w') as f:
-		json.dump(data, f, indent=2)
-	
-	return
-
-
+# Helper: Guess pose category from pose name
 EYEBROW = {'eyebrow', 'eyebrows', 'brow', 'brows', 'mayu'}
 EYE = {'eye', 'eyes', 'eyelid', 'eyelids', 'iris', 'pupil', 'pupils', 'me' }
 MOUTH = {'mouth', 'lips', 'lip', 'kuchibiru', 'kuchi'}
+
 import re
-# Helper: Guess pose category from pose name
+
 def guess_pose_category( pose_name ):
 	lower_name = pose_name.lower()
 	split_name = re.split(r'[ ._/]', lower_name)
@@ -286,6 +256,57 @@ def guess_pose_category( pose_name ):
 		return 'MOUTH'
 	else:
 		return 'OTHER'
+
+
+# Json format
+import json
+# Save PoseBook into a file (JSON)
+def save_book_to_json( book: spl.PoseBook, filepath, use_armature_space=False ):
+	'''
+		Parameters:
+			book: PoseBook
+			filepath: str
+			use_armature_space: bool
+				True: Save bone location and rotation in armature space (if possible)
+				False: Save bone location and rotation in bone local space
+	'''
+
+	poses = book.poses
+
+	# Convert to JSON
+	data = []
+	for pose in poses:
+		pose_data = {
+			'name' : pose.name,
+			'name_alt' : pose.name_alt,
+			'category' : pose.category,
+			'space' : 'ARMATURE' if use_armature_space else 'LOCAL',
+			'bones' : [],
+		}
+		for bone_data in pose.bones:
+			name = bone_data.name
+			loc = Vector(bone_data.location)
+			rot = Quaternion(bone_data.rotation)
+			sca = Vector(bone_data.scale)
+
+			if use_armature_space:
+				pbone = book.get_armature().pose.bones.get(name)
+				loc, rot, sca = utils.to_armature_space( loc, rot, sca, pbone )
+
+			bd = {
+				'name' : name,
+				'location' : loc[:],
+				'rotation' : rot[:],
+				'scale' : sca[:],
+			}
+			pose_data['bones'].append(bd)
+		data.append(pose_data)
+	
+	# Save to file
+	with open(filepath, 'w') as f:
+		json.dump(data, f, indent=2)
+	
+	return
 
 
 # Load PoseBook from a file (JSON)
@@ -304,14 +325,26 @@ def load_book_from_json( book: spl.PoseBook, filepath ):
 		pose.name = pose_data.get('name')
 		pose.name_alt = pose_data.get('name_alt')
 		pose.category = pose_data.get('category', 'NONE')
-		if pose.category == 'NONE': # Guess
-			pose.category = guess_pose_category( pose.name )
+		# if pose.category == 'NONE' and auto_set_category: # Guess
+		# 	pose.category = guess_pose_category( pose.name )
+		
+		space = pose_data.get('space', 'LOCAL')
 
 		for bone_data in pose_data.get('bones'):
+			name = bone_data.get('name')
+			loc = Vector( bone_data.get('location') )
+			rot = Quaternion( bone_data.get('rotation') )
+			sca = Vector( bone_data.get('scale', (1.0, 1.0, 1.0))  )
+
+			if space == 'ARMATURE':
+				pbone = book.get_armature().pose.bones.get(name)
+				loc, rot, sca = utils.to_armature_space( loc, rot, sca, pbone, invert=True )
+
 			bd = pose.bones.add()
-			bd.name = bone_data.get('name')
-			bd.location = bone_data.get('location')
-			bd.rotation = bone_data.get('rotation')
+			bd.name = name
+			bd.location = loc
+			bd.rotation = rot
+			bd.scale = sca
 
 	# remove path and extension from filename
 	book.name = os.path.splitext( os.path.basename(filepath) )[0]
@@ -470,8 +503,8 @@ def load_book_from_csv( book: spl.PoseBook, filename, scale=0.08 ):
 					print(f'Pose "{name}" is already exists. Overwrite it.')
 
 				pose.category = _POSE_CATEGORIES[cat_index] if cat_index < len(_POSE_CATEGORIES) and cat_index >= 0 else 'OTHER'
-				if pose.category == 0:
-					pose.category = guess_pose_category(pose.name)
+				# if pose.category == 0:
+				# 	pose.category = guess_pose_category(pose.name)
 				return pose
 
 			# if the line is PMXMorph header, create a new pose

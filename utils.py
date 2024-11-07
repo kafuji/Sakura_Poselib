@@ -1,8 +1,9 @@
 #############################################
 # Helper functions
 import bpy
-from mathutils import Quaternion
+from mathutils import Matrix, Vector, Quaternion
 import math
+from typing import Tuple
 
 # helper: check pose bone is visible
 def is_pose_bone_visible( pbone: bpy.types.PoseBone ) -> bool:
@@ -63,4 +64,25 @@ def has_scale(v, threshold=1e-6):
 def has_transform( loc, rot, scale, threshold=1e-6 ):
     """Check if the transform is less than minimal"""
     return has_translation(loc, threshold) or has_rotation(rot, threshold) or has_scale(scale, threshold)
+
+
+#############################################
+# Conversion functions
+#############################################
+
+def to_armature_space(loc: Vector, rot: Quaternion, sca: Vector, pbone: bpy.types.PoseBone, invert:bool = False) -> Tuple[Vector, Quaternion]:
+    if not pbone:
+        return loc, rot, sca
+
+    mtx = pbone.bone.matrix_local.to_3x3()
+
+    if invert:
+        mtx.invert()
+
+    new_loc = mtx @ loc
+    new_rot = Quaternion( (mtx @ rot.axis) * -1, rot.angle).normalized()
+    new_sca = mtx @ (sca - Vector((1,1,1))) + Vector((1,1,1))
+
+    return new_loc, new_rot, new_sca
+
 

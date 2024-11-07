@@ -39,6 +39,8 @@ O	Send to mmd_tools	mmd_toolsに送る
 
 O	Save to Json	Jsonファイルに書き出し
 *	Save active PoseBook to a Json file	アクティブなポーズブックをJsonファイルに書き出します
+*	Use Armature Space	アーマチュア空間を使用
+*	Save transforms in armature space instead of bone local space. Making it compatible with armature with different bone rolls	ボーンローカルスペースの代わりにアーマチュアスペースで変形を保存します。異なるボーンロールを持つアーマチュアとの互換性を持たせます
 
 O	Load from Json	Jsonファイルから読み込み
 *	Load a PoseBook from a Json file	Jsonファイルからポーズブックを読み込みます
@@ -46,7 +48,6 @@ O	Load from Json	Jsonファイルから読み込み
 O	Load from CSV	CSVファイルから読み込み
 *	Load a PoseBook from a CSV file (compatible with PMX Editor)	CSVファイル(PMX Editor 互換)からポーズブックを読み込みます
 *	Scale factor (MMD -> Blender)	スケールファクター（MMD -> Blender）
-
 
 O	Save to CSV	CSVファイルに書き出し
 *	Save active PoseBook to a CSV file (compatible with PMX Editor)	アクティブなポーズブックをCSVファイル(PMX Editor互換)に書き出します

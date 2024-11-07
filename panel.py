@@ -117,7 +117,11 @@ class SPL_MT_PoseBookMenu(bpy.types.Menu):
 		l:bpy.types.UILayout = self.layout
 		l.operator( 'spl.merge_posebook', icon='OUTLINER_OB_GROUP_INSTANCE')
 		l.separator()
-		l.menu( 'SPL_MT_ConvertMenu', text='Convert', icon='EXPORT')
+		l.menu( 'SPL_MT_ImportMenu', icon='IMPORT')
+		l.menu( 'SPL_MT_ExportMenu', icon='EXPORT')
+		l.separator()
+		l.menu( 'SPL_MT_LoadMenu', icon='FILE_FOLDER')
+		l.menu( 'SPL_MT_SaveMenu', icon='FILE_TICK')
 
 # Submenu for export acitons
 class SPL_MT_ConvertMenu(bpy.types.Menu):
@@ -140,6 +144,47 @@ class SPL_MT_ConvertMenu(bpy.types.Menu):
 		l.separator()
 		l.operator('spl.load_from_csv', icon='FILE_FOLDER')
 		l.operator('spl.save_to_csv', icon='CURRENT_FILE')
+
+# Submenu for Import actions
+class SPL_MT_ImportMenu(bpy.types.Menu):
+	bl_label = "Import"
+	bl_idname = "SPL_MT_ImportMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator('spl.load_from_poselibrary', icon='IMPORT')
+		l.operator('spl.load_from_mmdtools', icon='IMPORT')
+
+
+# Submenu for Export actions
+class SPL_MT_ExportMenu(bpy.types.Menu):
+	bl_label = "Export"
+	bl_idname = "SPL_MT_ExportMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator('spl.convert_to_poselibrary', icon='EXPORT')
+		l.operator('spl.send_to_mmdtools', icon='EXPORT')
+
+# Submenu for Save actions
+class SPL_MT_SaveMenu(bpy.types.Menu):
+	bl_label = "Save"
+	bl_idname = "SPL_MT_SaveMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator('spl.save_to_json', icon='CURRENT_FILE')
+		l.operator('spl.save_to_csv', icon='CURRENT_FILE')
+
+# Submenu for Load actions
+class SPL_MT_LoadMenu(bpy.types.Menu):
+	bl_label = "Load"
+	bl_idname = "SPL_MT_LoadMenu"
+
+	def draw(self, context):
+		l:bpy.types.UILayout = self.layout
+		l.operator('spl.load_from_json', icon='FILE_FOLDER')
+		l.operator('spl.load_from_csv', icon='FILE_FOLDER')
 
 
 # Submenu for Pose List
@@ -414,6 +459,12 @@ _classes = [
 	SPL_UL_PoseBook,
 	SPL_MT_PoseBookMenu,
 	SPL_MT_ConvertMenu,
+	SPL_MT_ImportMenu,
+	SPL_MT_ExportMenu,
+
+	SPL_MT_SaveMenu,
+	SPL_MT_LoadMenu,
+
 	SPL_MT_PoseListMenu,
 	SPL_MT_PoseListDisplayMenu,
 	SPL_UL_BoneList,
