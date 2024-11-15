@@ -8,15 +8,6 @@ maintainer = "Kafuji Sato"
 # Supported types: "add-on", "theme"
 type = "add-on"
 
-# Optional: add-ons can list which resources they will require:
-# * "files" (for access of any filesystem operations)
-# * "network" (for internet access)
-# * "clipboard" (to read and/or write the system clipboard)
-# * "camera" (to capture photos and videos)
-# * "microphone" (to capture audio)
-[permissions] 
-files = "Save/Load Poselib data as Json or CSV"
-
 # Optional link to documentation, support, source files, etc
 website = "https://github.com/kafuji/Sakura_Poselib"
 
@@ -25,11 +16,8 @@ website = "https://github.com/kafuji/Sakura_Poselib"
 tags = ["Animation"]
 
 blender_version_min = "4.2.0"
-# Optional: maximum supported Blender version
 # blender_version_max = "5.1.0"
 
-# License conforming to https://spdx.org/licenses/ (use "SPDX: prefix)
-# https://docs.blender.org/manual/en/dev/extensions/licenses.html
 license = [
   "SPDX:GPL-3.0-or-later",
 ]
@@ -39,21 +27,5 @@ copyright = [
    "2023-2024 Kafuji Sato",
 ]
 
-# Optional list of supported platforms. If omitted, the extension will be available in all operating systems.
-# platforms = ["windows-amd64", "macos-arm64", "linux-x86_64"]
-# Other supported platforms: "windows-arm64", "macos-x86_64"
-
-# Optional: bundle 3rd party Python modules.
-# https://docs.blender.org/manual/en/dev/extensions/python_wheels.html
-# wheels = [
-#   "./wheels/hexdump-3.3-py3-none-any.whl",
-#   "./wheels/jsmin-3.0.1-py3-none-any.whl"
-# ]
-
-# Optional: build setting.
-# https://docs.blender.org/manual/en/dev/extensions/command_line_arguments.html#command-line-args-extension-build
-# [build]
-# paths_exclude_pattern = [
-#   "/.git/"
-#   "__pycache__/"
-# ]
+[permissions] 
+files = "Save/Load Poselib data as Json or CSV"
