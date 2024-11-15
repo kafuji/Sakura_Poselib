@@ -4,7 +4,7 @@ id = "sakura_poselib"
 version = "1.2.5"
 name = "Sakura Poselib"
 tagline = "Yet another Pose Library with handful features"
-maintainer = "Kafuji Sato <kaf@tri6.net>"
+maintainer = "Kafuji Sato"
 # Supported types: "add-on", "theme"
 type = "add-on"
 
@@ -14,7 +14,8 @@ type = "add-on"
 # * "clipboard" (to read and/or write the system clipboard)
 # * "camera" (to capture photos and videos)
 # * "microphone" (to capture audio)
-permissions = ["files", "clipboard"]
+[permissions] 
+files = "Save/Load Poselib data as Json or CSV"
 
 # Optional link to documentation, support, source files, etc
 website = "https://github.com/kafuji/Sakura_Poselib"
