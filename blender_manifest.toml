@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "sakura_poselib"
-version = "1.2.1"
+version = "1.2.5"
 name = "Sakura Poselib"
 tagline = "Yet another Pose Library with handful features"
 maintainer = "Kafuji Sato <kaf@tri6.net>"
@@ -14,7 +14,7 @@ type = "add-on"
 # * "clipboard" (to read and/or write the system clipboard)
 # * "camera" (to capture photos and videos)
 # * "microphone" (to capture audio)
-permissions = ["files"]
+permissions = ["files", "clipboard"]
 
 # Optional link to documentation, support, source files, etc
 website = "https://github.com/kafuji/Sakura_Poselib"
@@ -30,7 +30,7 @@ blender_version_min = "4.2.0"
 # License conforming to https://spdx.org/licenses/ (use "SPDX: prefix)
 # https://docs.blender.org/manual/en/dev/extensions/licenses.html
 license = [
-  "MIT License",
+  "SPDX:GPL-3.0-or-later",
 ]
 
 # Optional: required by some licenses.

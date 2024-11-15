@@ -19,6 +19,11 @@
 
 ## Change Log
 
+- 2024/11/14: v.1.2.5
+  - Added blender_manifest.toml for Blender 4.2.
+    - This add-on is now work as well as an extension (for Blender 4.2 or later).
+  - Licence changed to GPL v3.
+
 - 2024/11/07: v.1.2.4
   - Save to JSON: Added the "Use Armature Space" option to save poses in armature space (default is True).
     - When enabled, bone transforms are saved in armature space, which is useful for sharing poses across different armatures with varying bone rolls.
@@ -81,7 +86,7 @@ The author is not responsible for any results from using this add-on. Please use
 
 ## License
 
-[MIT License](https://opensource.org/license/mit)
+[GPL 3.0](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ---
 
@@ -97,4 +102,4 @@ The author is not responsible for any results from using this add-on. Please use
 
 ## Copyright
 
-© 2021 Kafuji Sato, All rights reserved.
+© 2021-2024 Kafuji Sato
