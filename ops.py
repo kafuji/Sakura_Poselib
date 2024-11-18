@@ -1283,19 +1283,15 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator, RenameOp):
 
 
 # Register & Unregister
-import sys, inspect
-def register():
-    ops = [c[1] for c in inspect.getmembers(sys.modules[__name__], inspect.isclass) if issubclass(c[1], bpy.types.Operator)]
 
-    for cls in ops:
+def get_operator_classes():
+    """Get all operator classes in this module"""
+    return [cls for cls in globals().values() if isinstance(cls, type) and issubclass(cls, bpy.types.Operator) and cls.__module__ == __name__]
+
+def register():
+    for cls in get_operator_classes():
         bpy.utils.register_class(cls)
 
-    return
-
 def unregister():
-    ops = [c[1] for c in inspect.getmembers(sys.modules[__name__], inspect.isclass) if issubclass(c[1], bpy.types.Operator)]
-
-    for cls in ops:
+    for cls in get_operator_classes():
         bpy.utils.unregister_class(cls)
-    
-    return
