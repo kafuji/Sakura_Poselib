@@ -359,7 +359,7 @@ class PoseData(PropertyGroup):
 	def make_action_name( self ) -> str:
 		arm = self.get_armature()
 		book = self.get_book()
-		return "SPL_" + arm.name.rstrip("_arm") + "/" + book.name + "/" + self.name
+		return "SPL_" + arm.name.removesuffix("_arm") + "/" + book.name + "/" + self.name
 
 	# Return action for pose
 	def get_action(self) -> Optional[bpy.types.Action]:

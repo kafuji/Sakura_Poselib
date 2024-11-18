@@ -1,7 +1,6 @@
 # Description: Operator definitions for Sakura Poselib
 
 import bpy
-import sys, inspect
 from bpy.props import *
 
 from . import mmd, internal, utils
@@ -103,7 +102,7 @@ class SPL_OT_LoadFromMMDTools( bpy.types.Operator ):
     @requires_active_armature
     def poll(cls, context):
         # Check if mmd_tools is installed and the armature is an MMD model
-        if not mmd.is_mmd_tools_installed() or not mmd.get_model_root(context.object):
+        if not mmd.get_model_root(context.object):
             return False
 
         # All checks passed

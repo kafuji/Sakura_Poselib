@@ -1,8 +1,7 @@
 # Blender Translation reader
 #
 # Copyright (c) 2022 by Kafuji Sato
-# MIT license
-# https://opensource.org/licenses/mit-license.php
+# GNU General Public License v3.0
 
 # How it works:
 #

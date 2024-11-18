@@ -3,19 +3,23 @@
 import bpy
 from typing import Optional, Tuple
 
-# get mmd root object
-def get_model_root(obj: bpy.types.Object) -> bpy.types.Object:
-	if not obj:
-		return None
-	if obj.mmd_type == 'ROOT':
-		return obj
-	return get_model_root(obj.parent)
-
-
 # Check if mmd_tools is installed
 def is_mmd_tools_installed():
     addons = bpy.context.preferences.addons
-    return 'mmd_tools' in addons or 'bl_ext.blender_org.mmd_tools' in addons # legacy and new from Blender 4.2
+    return 'mmd_tools' in addons or 'bl_ext.blender_org.mmd_tools' in addons # check addon and extension (Blender 4.2 or later)
+
+
+# get mmd root object
+def get_model_root(obj: bpy.types.Object) -> bpy.types.Object:
+    if not is_mmd_tools_installed():
+        return None
+
+    if not obj:
+        return None
+    if obj.mmd_type == 'ROOT':
+        return obj
+
+    return get_model_root(obj.parent)
 
 
 # Get mmd_bone.name and name_e
