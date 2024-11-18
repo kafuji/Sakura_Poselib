@@ -19,7 +19,7 @@
 
 ## Change Log
 
-- 2024/11/18: v.1.2.6
+- 2024/11/18: v.1.2.7
   - Some minor fixes according to review from Blender Extension team.
 
 - 2024/11/14: v.1.2.5
