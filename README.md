@@ -19,6 +19,9 @@
 
 ## Change Log
 
+- 2024/11/18: v.1.2.6
+  - Some minor fixes according to review from Blender Extension team.
+
 - 2024/11/14: v.1.2.5
   - Added blender_manifest.toml for Blender 4.2.
     - This add-on is now work as well as an extension (for Blender 4.2 or later).
