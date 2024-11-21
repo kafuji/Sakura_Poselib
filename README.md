@@ -1,18 +1,27 @@
 # Sakura Poselib
 
-![keyart](img/keyart.png)
-
 ***Yet another pose library with a lot of handy features.***
+
+[Get it from Blender Extension Repository](https://extensions.blender.org/add-ons/sakura-poselib/)
 
 ## Overview
 
-- Adds simple and handy pose libraries to armatures.
-- Quickly add/update/preview poses form context menu.
-- Blend multiple poses with sliders.
-- Supports Blender's animation system. Keyframe your poses to make character animations!
-- Compatible with mmd_tools, PMX Editor via import/export functions.
+- Quickly create pose data from current armature pose.
+- Importing poses from the old pose library, mmd_tools, PMX Editor, etc.
+- Managing them by categorizing, batch renaming, etc.
+- Naturally combine poses by sliders, which work the same way as Shape Keys influence values.
+- Use them in Animation timeline by just keying pose values.
+- Save pose data to a file and reuse it with other models.
+- Use them in MMD models by exporting to mmd_tools or saving as CSV files.
+- And many other handy features are included.
+- Multi language: English and Japanese are supported.
 
-## Online Document
+## Where to find
+
+- Skura tab at 3D Viewport side panel.
+- Sakura Poselib subpanel in the Armature property panel.
+
+## Online Documents
 
 - [English](https://kafuji.github.io/Sakura-Creative-Suite/en/addons/Sakura_PoseLib/)
 - [日本語](https://kafuji.github.io/Sakura-Creative-Suite/ja/addons/Sakura_PoseLib/)
