@@ -2,6 +2,12 @@
 
 ***Yet another pose library with a lot of handy features.***
 
+Sakura Poselib was created to replace the old pose library, which was gradually phased out in the Blender 3 series.
+
+With this addon, you can easily create, manage, apply poses, and use them directly in your animations.
+
+You can also export them for other applications (currently PMX Editor is supported).
+
 [Get it from Blender Extension Repository](https://extensions.blender.org/add-ons/sakura-poselib/)
 
 ## Overview
