@@ -1,160 +1,163 @@
 Category	English	Japanese
 # Translate table for Sakura Poselib
 
-*	Yet another pose library with handful of features	便利な機能がいっぱいのポーズライブラリ
+	Yet another pose library with handful of features	便利な機能がいっぱいのポーズライブラリ
 
-*	Pose List Display Settings	ポーズリスト表示設定
-*	Display Settings:	表示設定：
-*	Show Apply Buttons	適用ボタンを表示
-*	Show apply buttons in the pose list	ポーズリストに適用ボタンを表示します
-*	Show Select Bones Buttons	ボーン選択ボタンを表示
-*	Show select bones buttons in the pose list	ポーズリストにボーン選択ボタンを表示します
-*	Show Replace Buttons	置き換えボタンを表示
-*	Show replace buttons in the pose list	ポーズリストに置き換えボタンを表示します
+	Pose List Display Settings	ポーズリスト表示設定
+	Display Settings:	表示設定：
+	Show Apply Buttons	適用ボタンを表示
+	Show apply buttons in the pose list	ポーズリストに適用ボタンを表示します
+	Show Select Bones Buttons	ボーン選択ボタンを表示
+	Show select bones buttons in the pose list	ポーズリストにボーン選択ボタンを表示します
+	Show Replace Buttons	置き換えボタンを表示
+	Show replace buttons in the pose list	ポーズリストに置き換えボタンを表示します
 
-*	Developer Settings	開発者設定
-*	Developer Mode	開発者モード
+	Activate Poses on Book Change	ブック変更時にポーズをアクティブにする
+	Activate the poses on the active book when the active book is changed	アクティブブックが変更されたときに、アクティブブックのポーズを有効化します
 
-*	Make this Poselib animatable/keyable. Pose editing will be disabled in this mode. Armature bones will be constrained by Actions	このPoselibをアニメーション可能/キーフレーム可能にします。このモードではポーズ編集が無効になります。アーマチュアボーンはアクションによって制約されます
+	Developer Settings	開発者設定
+	Developer Mode	開発者モード
 
-*	PoseBook	ポーズブック
+	Make this Poselib animatable/keyable. Pose editing will be disabled in this mode. Armature bones will be constrained by Actions	このPoselibをアニメーション可能/キーフレーム可能にします。このモードではポーズ編集が無効になります。アーマチュアボーンはアクションによって制約されます
+
+	PoseBook	ポーズブック
 
 O	Load from Pose Library	ポーズライブラリから読み込み
-*	Load the active Pose Library to PoseBook	アクティブなポーズライブラリをポーズブックに読み込みます
+	Load the active Pose Library to PoseBook	アクティブなポーズライブラリをポーズブックに読み込みます
 
 O	Convert to Pose Library	ポーズライブラリ用に変換
-*	Convert the active PoseBook to Pose Library format	アクティブなポーズブックをポーズライブラリ形式に変換します
+	Convert the active PoseBook to Pose Library format	アクティブなポーズブックをポーズライブラリ形式に変換します
 
 
 O	Load from mmd_tools	mmd_toolsから読み込み
-*	Load mmd_tools Bone Morphs as new PoseBook	mmd_toolsボーンモーフを新しいポーズブックとして読み込みます
+	Load mmd_tools Bone Morphs as new PoseBook	mmd_toolsボーンモーフを新しいポーズブックとして読み込みます
 
 
 O	Send to mmd_tools	mmd_toolsに送る
-*	Send active PoseBook to mmd_tools Bone Morphs	アクティブなポーズブックをmmd_toolsボーンモーフに送ります
+	Send active PoseBook to mmd_tools Bone Morphs	アクティブなポーズブックをmmd_toolsボーンモーフに送ります
 
-*	Clear Existing	既存のものをクリア
-*	"Clear existing Bone Morphs before sending	送信前に既存のボーンモーフをクリアします
+	Clear Existing	既存のものをクリア
+	"Clear existing Bone Morphs before sending	送信前に既存のボーンモーフをクリアします
 
 
 O	Save to Json	Jsonファイルに書き出し
-*	Save active PoseBook to a Json file	アクティブなポーズブックをJsonファイルに書き出します
-*	Use Armature Space	アーマチュア空間を使用
-*	Save transforms in armature space instead of bone local space. Making it compatible with armature with different bone rolls	ボーンローカルスペースの代わりにアーマチュアスペースで変形を保存します。異なるボーンロールを持つアーマチュアとの互換性を持たせます
+	Save active PoseBook to a Json file	アクティブなポーズブックをJsonファイルに書き出します
+	Use Armature Space	アーマチュア空間を使用
+	Save transforms in armature space instead of bone local space. Making it compatible with armature with different bone rolls	ボーンローカルスペースの代わりにアーマチュアスペースで変形を保存します。異なるボーンロールを持つアーマチュアとの互換性を持たせます
 
 O	Load from Json	Jsonファイルから読み込み
-*	Load a PoseBook from a Json file	Jsonファイルからポーズブックを読み込みます
+	Load a PoseBook from a Json file	Jsonファイルからポーズブックを読み込みます
 
 O	Load from CSV	CSVファイルから読み込み
-*	Load a PoseBook from a CSV file (compatible with PMX Editor)	CSVファイル(PMX Editor 互換)からポーズブックを読み込みます
-*	Scale factor (MMD -> Blender)	スケールファクター（MMD -> Blender）
+	Load a PoseBook from a CSV file (compatible with PMX Editor)	CSVファイル(PMX Editor 互換)からポーズブックを読み込みます
+	Scale factor (MMD -> Blender)	スケールファクター（MMD -> Blender）
 
 O	Save to CSV	CSVファイルに書き出し
-*	Save active PoseBook to a CSV file (compatible with PMX Editor)	アクティブなポーズブックをCSVファイル(PMX Editor互換)に書き出します
-*	Scale factor (Blender -> MMD)	スケールファクター（Blender -> MMD）
-*	Use MMD Bone Names	MMDボーン名を使用
-*	Use MMD bone names (mmd_tools:mmd_bone.name) instead of Blender bone names	Blenderボーン名の代わりにMMDボーン名（mmd_tools:mmd_bone.name）を使用します
-*	Use Alt Pose Names	別名を使用
-*	Use alternative pose names as primary (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	主キーとして、デフォルトのポーズ名（主に翻訳用）の代わりに、別名（PoseData.name_alt）を使用します
+	Save active PoseBook to a CSV file (compatible with PMX Editor)	アクティブなポーズブックをCSVファイル(PMX Editor互換)に書き出します
+	Scale factor (Blender -> MMD)	スケールファクター（Blender -> MMD）
+	Use MMD Bone Names	MMDボーン名を使用
+	Use MMD bone names (mmd_tools:mmd_bone.name) instead of Blender bone names	Blenderボーン名の代わりにMMDボーン名（mmd_tools:mmd_bone.name）を使用します
+	Use Alt Pose Names	別名を使用
+	Use alternative pose names as primary (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	主キーとして、デフォルトのポーズ名（主に翻訳用）の代わりに、別名（PoseData.name_alt）を使用します
 
-*	Replace (Current)	置き換え（現在のポーズ）
-*	Replace...	置き換え...
+	Replace (Current)	置き換え（現在のポーズ）
+	Replace...	置き換え...
 
-*	PoseBooks:	ポーズブック一覧：
-*	Poses:	ポーズ一覧：
-*	Pose Bone Data	ポーズのボーンデータ：
-*	Book Name	ブック名：
+	PoseBooks:	ポーズブック一覧：
+	Poses:	ポーズ一覧：
+	Pose Bone Data	ポーズのボーンデータ：
+	Book Name	ブック名：
 
-*	No model selected.	モデルが選択されていません。
-*	No active PoseBook.	アクティブなポーズブックがありません。
-*	No active pose.	アクティブなポーズがありません。
+	No model selected.	モデルが選択されていません。
+	No active PoseBook.	アクティブなポーズブックがありません。
+	No active pose.	アクティブなポーズがありません。
 
 O	Add PoseBook	ポーズブックを追加
-*	Add a new PoseBook. PoseBook is a collection of poses	新しいポーズブックを追加します。ポーズブックはポーズのコレクションです
+	Add a new PoseBook. PoseBook is a collection of poses	新しいポーズブックを追加します。ポーズブックはポーズのコレクションです
 
 O	Remove PoseBook	ポーズブックを削除
-*	Remove active PoseBook	アクティブなポーズブックを削除します
+	Remove active PoseBook	アクティブなポーズブックを削除します
 
-* 	Pose Name (Alt)	ポーズの別名
-* 	Alternative name. Mainly intended for translation. Not used as idetifier in blender	別名。主に翻訳用。Blenderでは識別子として使用されません
-*	Show Alt Names	別名を表示
-*	Show alternative pose names. Mainly intended for translation. Not used as idetifier in blender	別名を表示します。主に翻訳用。Blenderでは識別子として使用されません
+	Pose Name (Alt)	ポーズの別名
+	Alternative name. Mainly intended for translation. Not used as idetifier in blender	別名。主に翻訳用。Blenderでは識別子として使用されません
+	Show Alt Names	別名を表示
+	Show alternative pose names. Mainly intended for translation. Not used as idetifier in blender	別名を表示します。主に翻訳用。Blenderでは識別子として使用されません
 
 O	Select Pose Bones	ポーズボーンを選択
-*	Select bones used in the pose	ポーズに使用されているボーンを選択
+	Select bones used in the pose	ポーズに使用されているボーンを選択
 
 O	Apply Pose	ポーズを適用
-*	Apply the selected pose to armature	選択ポーズをアーマチュアに適用します
+	Apply the selected pose to armature	選択ポーズをアーマチュアに適用します
 
 O	Add Pose	ポーズを追加
-*	Add a new pose from the current armature pose	アーマチュアの現在のポーズから新しいポーズを追加します
+	Add a new pose from the current armature pose	アーマチュアの現在のポーズから新しいポーズを追加します
 
-*	Ignore Hidden Bones	非表示ボーンを無視
-*	Evaluate only bones visible in the viewport	ビューポートで表示されているボーンのみ評価します
-*	Ignore Driven Bones	被ドライブボーンを無視
-*	Evaluate only bones which transforms are not controlled by drivers	変形がドライバーによって制御されていないボーンのみ評価します
+	Ignore Hidden Bones	非表示ボーンを無視
+	Evaluate only bones visible in the viewport	ビューポートで表示されているボーンのみ評価します
+	Ignore Driven Bones	被ドライブボーンを無視
+	Evaluate only bones which transforms are not controlled by drivers	変形がドライバーによって制御されていないボーンのみ評価します
 
 O	Replace Pose	ポーズを置き換え
-*	Replace the selected pose with the current armature pose (overwrite)	選択ポーズをアーマチュアの現在のポーズで上書きし、置き換えます
+	Replace the selected pose with the current armature pose (overwrite)	選択ポーズをアーマチュアの現在のポーズで上書きし、置き換えます
 
 O	Auto Set Pose Category	ポーズカテゴリを自動設定
-*	Automatically set the category of the poses in the PoseBook (guess from the pose name)	ポーズブック内のポーズのカテゴリを自動設定します（ポーズ名から推測）
+	Automatically set the category of the poses in the PoseBook (guess from the pose name)	ポーズブック内のポーズのカテゴリを自動設定します（ポーズ名から推測）
 
 O	Clean Poses	ポーズデータを掃除
-*	Remove/report unused/invalid bones in poses within the active posebook	アクティブなポーズブック内のポーズの未使用/無効なボーンを削除/報告します
+	Remove/report unused/invalid bones in poses within the active posebook	アクティブなポーズブック内のポーズの未使用/無効なボーンを削除/報告します
 
 O	Move Pose to PoseBook	ポーズをポーズブックに移動
-*	Move the active pose to another PoseBook	アクティブなポーズを別のポーズブックに移動します
-*	Copy the pose instead of moving it	ポーズを移動する代わりにコピーします
+	Move the active pose to another PoseBook	アクティブなポーズを別のポーズブックに移動します
+	Copy the pose instead of moving it	ポーズを移動する代わりにコピーします
 
 O	Merge PoseBook	ポーズブックを統合
-*	Merge the active PoseBook to another PoseBook	アクティブなポーズブックを別のポーズブックに統合します
-*	Name of the target PoseBook	統合先ポーズブックの名前
-*	Copy the poses instead of moving them	ポーズを移動する代わりにコピーします
+	Merge the active PoseBook to another PoseBook	アクティブなポーズブックを別のポーズブックに統合します
+	Name of the target PoseBook	統合先ポーズブックの名前
+	Copy the poses instead of moving them	ポーズを移動する代わりにコピーします
 
-*	Check Bone Name	ボーン名前をチェック
-*	Remove/report bones with invalid names (which are not in the armature)	無効な名前のボーン（アーマチュアにないボーン）を削除/報告します
+	Check Bone Name	ボーン名前をチェック
+	Remove/report bones with invalid names (which are not in the armature)	無効な名前のボーン（アーマチュアにないボーン）を削除/報告します
 
-*	Check Bone Transform	ボーン変形をチェック
-*	Remove bones which are not contributing to the pose (i.e. bones with minimal transform)	ポーズに影響を与えていないボーン（つまり、最小限の変形を持つボーン）を削除します
-*	Lower than this threshold, the bone is considered as not contributing to the pose	このしきい値より低い場合、ボーンはポーズに影響を与えていないと見なされます
+	Check Bone Transform	ボーン変形をチェック
+	Remove bones which are not contributing to the pose (i.e. bones with minimal transform)	ポーズに影響を与えていないボーン（つまり、最小限の変形を持つボーン）を削除します
+	Lower than this threshold, the bone is considered as not contributing to the pose	このしきい値より低い場合、ボーンはポーズに影響を与えていないと見なされます
 
-*	Report Only	報告のみ
-*	Show the report only (in the Inforation view), don't remove any bones	報告のみ表示（情報ビューに表示）し、ボーンを削除しません
+	Report Only	報告のみ
+	Show the report only (in the Inforation view), don't remove any bones	報告のみ表示（情報ビューに表示）し、ボーンを削除しません
 
 O	Pose Bone Data	ポーズのボーンデータ
 O	Remove Pose	ポーズを削除
-*	Remove the selected pose from the PoseBook	選択ポーズをポーズブックから削除します
+	Remove the selected pose from the PoseBook	選択ポーズをポーズブックから削除します
 O	Move Pose	ポーズを移動
 
 O	Reset PoseBook	ポーズブックをリセット
-*	Reset all pose values to zero in the PoseBook	ポーズブックのすべてのポーズ値をゼロにリセットします
+	Reset all pose values to zero in the PoseBook	ポーズブックのすべてのポーズ値をゼロにリセットします
 
 O	Add Selected Bone to Pose	選択したボーンをポーズに追加
-*	Add selected bones to the active pose. You can edit transfrom values manually	選択したボーンをアクティブなポーズに追加します。変形値を手動で編集できます
+	Add selected bones to the active pose. You can edit transfrom values manually	選択したボーンをアクティブなポーズに追加します。変形値を手動で編集できます
 O	Remove Bone from Pose	ポーズからボーンを削除
-*	Remove the selected bone from the active pose	選択したボーンをアクティブなポーズから削除します
+	Remove the selected bone from the active pose	選択したボーンをアクティブなポーズから削除します
 
-*	Sakura Poselib Pose Preview	Sakura Poselibポーズプレビュー
-*	PoseLib Converter	Poselibコンバーター
-*	Bones:	ボーン一覧：
-*	Transforms:	変形一覧：
+	Sakura Poselib Pose Preview	Sakura Poselibポーズプレビュー
+	PoseLib Converter	Poselibコンバーター
+	Bones:	ボーン一覧：
+	Transforms:	変形一覧：
 
-*	Save / Load	保存 / 読み込み
+	Save / Load	保存 / 読み込み
 
 O	Batch Rename Poses	ポーズを一括リネーム
 O	Batch Rename Bones	ボーンを一括リネーム
-*	Rename bones within all Pose Data in the active PoseBook (useful for retargeting)	アクティブなポーズブック内のすべてのポーズデータのボーンを一括リネームします（リターゲティングに便利）
-*	Process All PoseBooks	すべてのポーズブックを処理
+	Rename bones within all Pose Data in the active PoseBook (useful for retargeting)	アクティブなポーズブック内のすべてのポーズデータのボーンを一括リネームします（リターゲティングに便利）
+	Process All PoseBooks	すべてのポーズブックを処理
 
 
-*	Import / Export	インポート/エクスポート
-*	Batch Operations	一括操作
+	Import / Export	インポート/エクスポート
+	Batch Operations	一括操作
 
 
 
 # Bone Categories
-*	Eyebrow	眉
-*	Eye	目
-*	Mouth	口
-*	Other	その他
+	Eyebrow	眉
+	Eye	目
+	Mouth	口
+	Other	その他

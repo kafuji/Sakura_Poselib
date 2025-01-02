@@ -37,6 +37,11 @@ class SPL_Preferences(bpy.types.AddonPreferences):
         default=True,
     )
 
+    activate_poses_on_book_change: BoolProperty(
+        name="Activate Poses on Book Change",
+        description="Activate the poses on the active book when the active book is changed",
+        default=False,
+    )
 
     def draw(self,context: bpy.types.Context):
         layout:bpy.types.UILayout = self.layout
@@ -49,11 +54,11 @@ class SPL_Preferences(bpy.types.AddonPreferences):
         flow.prop(self, "show_apply_buttons", icon='VIEWZOOM')
         flow.prop(self, "show_select_bones_buttons", icon='RESTRICT_SELECT_OFF' )
         flow.prop(self, "show_replace_buttons", icon='GREASEPENCIL')
-        
-        # box.prop(self, "show_alt_pose_names", icon='TEXT')
-        # box.prop(self, "show_apply_buttons", icon='VIEWZOOM')
-        # box.prop(self, "show_select_bones_buttons", icon='RESTRICT_SELECT_OFF' )
-        # box.prop(self, "show_replace_buttons", icon='GREASEPENCIL')
+
+        # Basic Behaviour Settings
+        box = layout.box()
+        box.label(text="Basic Behaviour")
+        box.prop(self, "activate_poses_on_book_change", icon='FILE_REFRESH')
 
         # Developer Settings
         # box = layout.box()

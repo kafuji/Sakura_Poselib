@@ -692,6 +692,10 @@ class PoselibData(PropertyGroup):
 
 	# callback for active book index change
 	def on_update_active_book_index(self, context):
+		prefs = prefs = bpy.context.preferences.addons[__package__].preferences
+		if not prefs.activate_poses_on_book_change:
+			return
+
 		# apply new book
 		book = self.get_active_book()
 		if book:

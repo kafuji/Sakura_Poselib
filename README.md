@@ -34,6 +34,10 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/01/02: v1.2.8
+  - Added "Activate Poese on Book Change" option in addon preferences (default is False).
+    - When enabled, the poses on the active book will be activated when the active book is changed (previous versions default behavior).
+
 - 2024/11/18: v.1.2.7
   - Some minor fixes according to review from Blender Extension team.
 
