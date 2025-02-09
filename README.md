@@ -34,8 +34,13 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/02/10: v1.2.9
+  - Add Pose and Replace Pose:
+    - Fixed an issue where hidden bones are not ignored when adding or replacing poses with the "Ignore Hidden Bones" option enabled on Blender 4.2 or later.
+    - Operator option "Ignore Hidden Bones" is now enabled by default.
+
 - 2025/01/02: v1.2.8
-  - Added "Activate Poese on Book Change" option in addon preferences (default is False).
+  - Added "Activate Poses on Book Change" option in addon preferences (default is False).
     - When enabled, the poses on the active book will be activated when the active book is changed (previous versions default behavior).
 
 - 2024/11/18: v.1.2.7

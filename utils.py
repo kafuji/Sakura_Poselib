@@ -17,7 +17,8 @@ def is_pose_bone_visible( pbone: bpy.types.PoseBone ) -> bool:
         if not any(pbone.bone.layers[i] and arm.data.layers[i] for i in range(len(pbone.bone.layers))):
             return False
     else: # 4.x~
-        if not any(bcoll.is_visible for bcoll in pbone.bone.collections):
+        attr = 'is_visible_effectively' if bpy.app.version > (4,2,0) else 'is_visible'
+        if not any(getattr(bcoll, attr) for bcoll in pbone.bone.collections):
             return False
 
     return True

@@ -396,7 +396,7 @@ class SPL_OT_AddPose( bpy.types.Operator ):
     ignore_hidden_bones: BoolProperty(
         name="Ignore Hidden Bones", 
         description="Evaluate only bones visible in the viewport",
-        default=False
+        default=True
     )
 
     ignore_driven_bones: BoolProperty(
@@ -476,7 +476,7 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
     ignore_hidden_bones: BoolProperty(
         name="Ignore Hidden Bones", 
         description="Evaluate only bones visible in the viewport",
-        default=False
+        default=True
     )
 
     ignore_driven_bones: BoolProperty(
