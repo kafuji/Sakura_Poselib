@@ -72,6 +72,9 @@ O	Save to CSV	CSVファイルに書き出し
 	No active PoseBook.	アクティブなポーズブックがありません。
 	No active pose.	アクティブなポーズがありません。
 
+	PoseBook Operations	ポーズブック操作メニュー
+	Pose Operations	ポーズ操作メニュー
+
 O	Add PoseBook	ポーズブックを追加
 	Add a new PoseBook. PoseBook is a collection of poses	新しいポーズブックを追加します。ポーズブックはポーズのコレクションです
 
@@ -109,6 +112,9 @@ O	Clean Poses	ポーズデータを掃除
 O	Move Pose to PoseBook	ポーズをポーズブックに移動
 	Move the active pose to another PoseBook	アクティブなポーズを別のポーズブックに移動します
 	Copy the pose instead of moving it	ポーズを移動する代わりにコピーします
+
+O	Duplicate PoseBook	ポーズブックを複製
+	Duplicate the active PoseBook	アクティブなポーズブックを複製します
 
 O	Merge PoseBook	ポーズブックを統合
 	Merge the active PoseBook to another PoseBook	アクティブなポーズブックを別のポーズブックに統合します

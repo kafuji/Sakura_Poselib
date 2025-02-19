@@ -115,6 +115,7 @@ class SPL_MT_PoseBookMenu(bpy.types.Menu):
 
 	def draw(self, context):
 		l:bpy.types.UILayout = self.layout
+		l.operator( 'spl.duplicate_posebook', icon='DUPLICATE')
 		l.operator( 'spl.merge_posebook', icon='OUTLINER_OB_GROUP_INSTANCE')
 		l.separator()
 		l.menu( 'SPL_MT_ImportMenu', icon='IMPORT')

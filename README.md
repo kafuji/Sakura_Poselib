@@ -34,6 +34,10 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/02/20: v1.3.0
+  - Added "Duplicate PoseBook" Operator.
+    - Can be found in the PoseBook menu.
+
 - 2025/02/10: v1.2.9
   - Add Pose and Replace Pose:
     - Fixed an issue where hidden bones are not ignored when adding or replacing poses with the "Ignore Hidden Bones" option enabled on Blender 4.2 or later.

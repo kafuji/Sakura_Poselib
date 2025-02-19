@@ -645,6 +645,32 @@ class SPL_OT_MovePoseToPoseBook(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
+# Operator: Duplicate PoseBook
+class SPL_OT_DuplicatePoseBook(bpy.types.Operator):
+    bl_idname = "spl.duplicate_posebook"
+    bl_label = "Duplicate PoseBook"
+    bl_description = "Duplicate the active PoseBook"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    @requires_active_posebook
+    @requires_animation_disabled
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+
+        # Duplicate the posebook
+        new_book = spl.add_book()
+        new_book.name = book.name + " - Copy"
+        new_book.copy_from(book)
+
+        return {'FINISHED'}
+
+
 # Operator: Merge PoseBook to another
 class SPL_OT_MergePoseBook(bpy.types.Operator):
     bl_idname = "spl.merge_posebook"
