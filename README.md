@@ -39,7 +39,7 @@ You can also export them for other applications (currently PMX Editor is support
     - Removed Save/Load submenu and merged them to the Import/Export submenu.
     - Added "Scale Pose Data" Operator.
       - Scales translation(bone movement) of pose data in the active/all pose books.
-      - Canb used to adjust pose data to fit the model size.
+      - Can be used to adjust pose data to fit the model size.
 
 - 2025/02/20: v1.3.0
   - Added "Duplicate PoseBook" Operator.
