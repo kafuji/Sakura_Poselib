@@ -334,6 +334,56 @@ class SPL_OT_RemovePoseBook( bpy.types.Operator ):
 
         return {'FINISHED'}
 
+# Operator: Scale PoseData (scale translation values of pose data in the posebook)
+class SPL_OT_ScalePoseData( bpy.types.Operator ):
+    bl_idname = "spl.scale_pose_data"
+    bl_label = "Scale Pose Data"
+    bl_description = "Scale translation (Bone movement) of the pose data in the active PoseBook. Use it after changing scale of the model"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    process_all_books: BoolProperty(
+        name="Process All PoseBooks",
+        description="Process all PoseBooks in the Pose Library. Otherwise, only the active PoseBook will be processed",
+        default=False,
+    )
+
+    scale: FloatProperty(
+        name="Scale",
+        description="Scale factor",
+        default=1.0,
+        min=0.0,
+        soft_min=0.0,
+        max=10.0,
+        soft_max=10.0,
+        step=10,
+        precision=2,
+    )
+
+    @classmethod
+    @requires_active_posebook
+    @requires_animation_disabled
+    def poll(cls, context):
+        return True
+
+    # Show Options first
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    # Execute the operator
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        books = spl.books if self.process_all_books else [spl.get_active_book()]
+
+        # Scale the pose data
+        for book in books:
+            for pose in book.poses:
+                for bone in pose.bones:
+                    bone.location *= self.scale
+
+        # Apply the changes
+        spl.get_active_book().apply_poses( reset_current_pose=False )
+
+        return {'FINISHED'}
 
 
 # Operator: Apply Pose

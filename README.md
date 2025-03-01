@@ -34,6 +34,13 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/03/01: v1.3.1
+  - PoseBook Menu:
+    - Removed Save/Load submenu and merged them to the Import/Export submenu.
+    - Added "Scale Pose Data" Operator.
+      - Scales translation(bone movement) of pose data in the active/all pose books.
+      - Canb used to adjust pose data to fit the model size.
+
 - 2025/02/20: v1.3.0
   - Added "Duplicate PoseBook" Operator.
     - Can be found in the PoseBook menu.

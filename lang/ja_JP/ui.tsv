@@ -60,6 +60,12 @@ O	Save to CSV	CSVファイルに書き出し
 	Use Alt Pose Names	別名を使用
 	Use alternative pose names as primary (PoseData.name_alt) instead of default pose names (mainly intended for translation purposes)	主キーとして、デフォルトのポーズ名（主に翻訳用）の代わりに、別名（PoseData.name_alt）を使用します
 
+O	Scale Pose Data	ポーズデータを拡縮
+	Scale translation (Bone movement) of the pose data in the active/all PoseBook. Use it after changing scale of the model	アクティブまたは全てのポーズブックのポーズデータの変位（ボーン移動）を拡縮します。モデルのスケールを変更した後に使用してください
+	Scale factor	スケールファクター
+
+	Process all PoseBooks in the Pose Library. Otherwise, only the active PoseBook will be processed	ポーズライブラリ内のすべてのポーズブックを処理します。それ以外の場合、アクティブなポーズブックのみが処理されます
+
 	Replace (Current)	置き換え（現在のポーズ）
 	Replace...	置き換え...
 
