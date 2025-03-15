@@ -665,7 +665,9 @@ class SPL_OT_MovePoseToPoseBook(bpy.types.Operator):
     def draw(self, context):
         l = self.layout
         l.use_property_split = True
-        l.prop_search(self, "posebook_name", context.object.sakura_poselib, "books", text="PoseBook")
+        spl = get_poselib_from_context(context)
+
+        l.prop_search(self, "posebook_name", spl, "books", text="PoseBook")
         l.prop(self, "do_copy")
 
     def execute(self, context):
@@ -754,7 +756,8 @@ class SPL_OT_MergePoseBook(bpy.types.Operator):
     def draw(self, context):
         l = self.layout
         l.use_property_split = True
-        l.prop_search(self, "posebook_name", context.object.sakura_poselib, "books", text="PoseBook")
+        spl = get_poselib_from_context(context)
+        l.prop_search(self, "posebook_name", spl, "books", text="PoseBook")
         l.prop(self, "do_copy")
 
     def execute(self, context):
@@ -778,6 +781,9 @@ class SPL_OT_MergePoseBook(bpy.types.Operator):
         # Remove the posebook
         if not self.do_copy:
             spl.remove_book(book)
+        
+        # set active book to target book
+        spl.active_book_index = spl.books.find(self.posebook_name)
 
         return {'FINISHED'}
 
