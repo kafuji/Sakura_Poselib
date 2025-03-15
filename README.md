@@ -34,6 +34,9 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/03/15: v1.3.2
+  - Fixed issues where the pose book list was not being displayed on the "Merge PoseBooks" and the "Move Pose to PoseBook" operator UI.
+
 - 2025/03/01: v1.3.1
   - PoseBook Menu:
     - Removed Save/Load submenu and merged them to the Import/Export submenu.
