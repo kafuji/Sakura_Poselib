@@ -18,7 +18,7 @@ You can also export them for other applications (currently PMX Editor is support
 - Naturally combine poses by sliders, which work the same way as Shape Keys influence values.
 - Use them in Animation timeline by just keying pose values.
 - Save pose data to a file and reuse it with other models.
-- Use them in MMD models by exporting to mmd_tools or saving as CSV files.
+- Use them in MMD models by exporting to mmd_tools or saving as CSV files or VPD files.
 - And many other handy features are included.
 - Multi language: English and Japanese are supported.
 
@@ -33,6 +33,17 @@ You can also export them for other applications (currently PMX Editor is support
 - [日本語](https://kafuji.github.io/Sakura-Creative-Suite/ja/addons/Sakura_PoseLib/)
 
 ## Change Log
+
+- 2025/04/22: v.1.4.0
+  - Added "Sort Poses" operator on Pose List menu.
+    - Sorts poses by name or category.
+  - Added "Load Pose from VPD" and "Save Pose to VPD" operators.
+    - Load/Save pose data from/to VPD file format.
+    - VPD files can be used in MMD applications.
+  - Save to CSV and Load from CSV:
+    - Enhanced internal data handling for better results.
+    - It still struggles with some poses, which have complex bone rotations. Please use "Export to mmd_tools" or "Save Pose to VPD" for complex poses.
+  - Many minior bug fixes and improvements.
 
 - 2025/03/15: v1.3.2
   - Fixed issues where the pose book list was not being displayed on the "Merge PoseBooks" and the "Move Pose to PoseBook" operator UI.
