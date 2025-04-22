@@ -5,13 +5,12 @@ from bpy.types import PropertyGroup
 from bpy.props import *
 from mathutils import Vector, Quaternion, Euler, Matrix
 from typing import Optional
-import time
 
 from . import utils
 
 # pose categories definition
 POSE_CATEGORIES = [
-			("ALL", "All", "Show All"), 
+			("ALL", "All", "Show All"), # For display purposes only
 			("EYEBROW", "Eyebrow", "Show Eyebrow Poses"), 
 			("EYE", "Eye", "Show Eye Poses"),
 			("MOUTH", "Mouth", "Show Mouth Poses"), 
@@ -632,7 +631,7 @@ class PoseBook(PropertyGroup):
 
 		# Remove pose
 		self.poses.remove(index)
-		if index >= self.active_pose_index:
+		if index <= self.active_pose_index:
 			self.active_pose_index -= 1
 		if self.active_pose_index < 0:
 			self.active_pose_index = 0
@@ -643,7 +642,43 @@ class PoseBook(PropertyGroup):
 		if index >= 0:
 			self.remove_pose_by_index(index)
 		return
-	
+
+	def sort_poses(self, sort_by:str = 'NAME', reverse:bool = False):
+		# CollectionProperty doesn't have sort method, so we need to sort manually
+		# by using move(from_idx,to_idx) method
+
+		active_pose_name = self.get_active_pose().name if self.get_active_pose() else None
+
+		if sort_by == 'NAME':
+			new_order = sorted(self.poses, key=lambda x: x.name, reverse=reverse)
+		elif sort_by == 'CATEGORY':
+			cat_order = {cat[0]: i for i, cat in enumerate(POSE_CATEGORIES[1:])}
+			new_order = sorted(self.poses, key=lambda x: cat_order.get(x.category, 99), reverse=reverse)
+			# for pose in new_order: # Debug
+			# 	print(pose.category, pose.name)
+		else:
+			print("Unknown sort type: ", sort_by)
+			return
+
+		# Move items to new order
+		name_idx = {pose.name: i for i, pose in enumerate(new_order)}
+		for name, new_idx in name_idx.items():
+			cur_idx = self.poses.find(name)
+			self.poses.move(cur_idx, new_idx)
+
+		# Restore active pose
+		if active_pose_name:
+			active_pose = self.get_pose_by_name(active_pose_name)
+			if active_pose:
+				self.active_pose_index = self.poses.find(active_pose.name)
+			else:
+				self.active_pose_index = 0
+		else:
+			self.active_pose_index = 0
+
+		return
+
+
 	# Copy entire data from another PoseBook
 	def copy_from(self, src: "PoseBook"):
 		self.poses.clear()
@@ -910,7 +945,7 @@ def get_poselib_from_context( context: bpy.types.Context ) -> Optional[PoselibDa
 	if not obj:
 		return None
 	
-	return get_poselib(obj)
+	return get_poselib(obj) 
 
 # Get Root PropertyGroup from Object
 def get_poselib( obj: bpy.types.Object ) -> Optional[PoselibData]:

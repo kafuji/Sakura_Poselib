@@ -106,6 +106,15 @@ O	Add Pose	ポーズを追加
 	Ignore Driven Bones	被ドライブボーンを無視
 	Evaluate only bones which transforms are not controlled by drivers	変形がドライバーによって制御されていないボーンのみ評価します
 
+	Where to place the new pose in the PoseBook	新しいポーズのポーズブック内における配置場所
+	Add the new pose at the top of the PoseBook	ポーズブックの先頭に新しいポーズを追加します
+	Insert the new pose at the next of active pose	アクティブなポーズの次に新しいポーズを挿入します
+	Append the new pose at the bottom of the PoseBook	ポーズブックの最後に新しいポーズを追加します
+
+O	Sort Poses	ポーズをソート
+	Sort poses in the active PoseBook by name or category	アクティブなポーズブック内のポーズを名前またはカテゴリでソートします
+	Sort in reverse order	逆順でソート
+
 O	Replace Pose	ポーズを置き換え
 	Replace the selected pose with the current armature pose (overwrite)	選択ポーズをアーマチュアの現在のポーズで上書きし、置き換えます
 
@@ -166,7 +175,13 @@ O	Batch Rename Bones	ボーンを一括リネーム
 	Import / Export	インポート/エクスポート
 	Batch Operations	一括操作
 
+O	Save Pose to VPD	VPDファイルに保存
+	Save the active pose to a VPD file (compatible with MMD applications)	アクティブなポーズをVPDファイル（MMDアプリケーション互換）に保存します
 
+O	Load Pose from VPD	VPDファイルから読み込み
+	Load a pose from a VPD file (compatible with MMD applications)	VPDファイル（MMDアプリケーション互換）からポーズを読み込みます
+	Apply Pose	ポーズを適用
+	Apply the loaded pose	読み込んだポーズを適用します
 
 # Bone Categories
 	Eyebrow	眉

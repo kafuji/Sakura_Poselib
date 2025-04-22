@@ -187,9 +187,13 @@ class SPL_MT_PoseListMenu(bpy.types.Menu):
 		l.operator('spl.move_pose_to_posebook', icon='FILE_PARENT')
 		l.separator()
 		l.operator( 'spl.auto_set_pose_category', icon='LINENUMBERS_ON')
-		l.operator( 'spl.batch_rename_poses', icon='SORTALPHA')
-		l.operator( 'spl.batch_rename_bones', icon='SORTALPHA')
+		l.operator( 'spl.batch_rename_poses', icon='SYNTAX_OFF')
+		l.operator( 'spl.batch_rename_bones', icon='SYNTAX_OFF')
+		l.operator( 'spl.sort_poses', icon='SORTALPHA')
 		l.operator( 'spl.clean_poses', icon='BRUSH_DATA')
+		l.separator()
+		l.operator( 'spl.save_pose_to_vpd', icon='EXPORT')
+		l.operator( 'spl.load_pose_from_vpd', icon='IMPORT')
 
 # Submenu for Pose List Display Settings
 class SPL_MT_PoseListDisplayMenu(bpy.types.Menu):

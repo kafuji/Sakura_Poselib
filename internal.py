@@ -215,7 +215,7 @@ def convert_poses_to_mmdtools( book: spl.PoseBook, use_alt_pose_names=False, cle
 		if not morph:
 			morph = bone_morphs.add()
 			morph.name = pose_name
-			morph.category = pose.category
+			morph.category = pose.category if pose.category in ('EYEBROW', 'EYE', 'MOUTH') else 'OTHER'
 
 		# clear bone data
 		morph.data.clear()
@@ -312,9 +312,10 @@ def save_book_to_json( book: spl.PoseBook, filepath, use_armature_space=False ):
 # Load PoseBook from a file (JSON)
 def load_book_from_json( book: spl.PoseBook, filepath ):
 	poses = book.poses
-
 	poses.clear()
-	
+
+	arm = book.get_armature()
+
 	# Load from file
 	with open(filepath, 'r') as f:
 		data = json.load(f)
@@ -337,7 +338,11 @@ def load_book_from_json( book: spl.PoseBook, filepath ):
 			sca = Vector( bone_data.get('scale', (1.0, 1.0, 1.0))  )
 
 			if space == 'ARMATURE':
-				pbone = book.get_armature().pose.bones.get(name)
+				pbone = arm.pose.bones.get(name)
+				if pbone is None:
+					print(f'Warning: Bone "{name}" not found in "{arm.name}", skipping...')
+					continue
+
 				loc, rot, sca = utils.to_armature_space( loc, rot, sca, pbone, invert=True )
 
 			bd = pose.bones.add()
@@ -362,29 +367,10 @@ _POSE_CATEGORIES = [
 # Save PoseBook into a file (CSV)
 def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
 	poses = book.poses
-	obj: bpy.types.Object = book.id_data
-	arm: bpy.types.Armature = obj.data
-	matrix_world = obj.matrix_world
-	bone_util_cls = mmd.BoneConverterPoseMode if arm.pose_position != 'REST' else mmd.BoneConverter
+	arm = book.get_armature()
+	scale = scale * arm.scale[0] # consider armature scale
 
-	class _RestBone:
-		def __init__(self, b:bpy.types.PoseBone):
-			self.matrix_local = matrix_world @ b.bone.matrix_local
-
-	class _PoseBone: # world space
-		def __init__(self, b:bpy.types.PoseBone):
-			self.bone = _RestBone(b)
-			self.matrix = matrix_world @ b.matrix
-			self.matrix_basis = b.matrix_basis
-			self.location = b.location
-
-	converter_cache = {}
-	def _get_converter(b):
-		if b not in converter_cache:
-			world_scale = matrix_world.to_scale()
-			converter_cache[b] = bone_util_cls(_PoseBone(b), scale * world_scale, invert=True)
-		return converter_cache[b]
-
+	converters = {b: mmd.BoneConverter(b, scale, invert=True) for b in arm.pose.bones}
 
 	with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
 		# write header
@@ -413,12 +399,10 @@ def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_nam
 			for index, bone in enumerate(pose.bones):
 				# Write a bone data
 				# format: f"PmxBoneMorph,{pose.name},index,{bone.name},{loc.x},{loc.y},{loc.z},{rot.x},{rot.y},{rot.z}"
-				# loc = bone.location * 12.5 (convert to MMD unit)
-				# rot = bone.rotation.to_euler('XYZ') * 180 / math.pi (convert to degree)
 
-				pbone = obj.pose.bones.get(bone.name)
+				pbone = arm.pose.bones.get(bone.name)
 				if pbone is None:
-					print(f'Warning: Bone "{bone.name}" in pose "{pose.name}" not found in "{obj.name}", skippping...')
+					print(f'Warning: Bone "{bone.name}" in pose "{pose.name}" not found in "{arm.name}", skipping...')
 					continue
 
 				if use_mmd_bone_names:
@@ -426,12 +410,21 @@ def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_nam
 				else:
 					bone_name_j = pbone.name
 
-				# use bone converter from mmd_tools to convert bone location and rotation to MMD unit
-				converter = _get_converter(pbone) 
-				loc = converter.convert_location( bone.location )
-				rw, rx, ry, rz = bone.rotation
-				rw, rx, ry, rz = converter.convert_rotation( [rx, ry, rz, rw] )
-				rot = mmd.quaternion_to_degrees( Quaternion((rw, rx, ry, rz)) )
+				# Convet using mmd_tools' BoneConverter
+				converter = converters[pbone]
+				loc = converter.convert_location(bone.location)
+				rot = converter.convert_rotation(bone.rotation)
+				rot.x, rot.y, rot.z = utils.quat_to_euler_mmd(rot, degrees=True)
+
+				# # convert to armature space
+				# loc, rot, _  = utils.to_armature_space( bone.location, bone.rotation, bone.scale, pbone )
+				# loc = loc * scale * arm.scale[0] # convert to MMD unit considering armature scale
+				# rot = utils.quaternion_to_degrees( rot )
+
+				# # Swap YZ axis for MMD
+				# loc = utils.swap_axis( loc, (0, 2, 1) )
+				# rot = utils.swap_axis( rot, (0, 2, 1) )
+
 				bone_data = f'PmxBoneMorph,"{pose_name}",{index},"{bone_name_j}",{loc.x:.5g},{loc.y:.5g},{loc.z:.5g},{rot.x:.5g},{rot.y:.5g},{rot.z:.5g}\n'
 				csvfile.write(bone_data)
 
@@ -445,30 +438,9 @@ def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_nam
 # Load PoseBook from a file (CSV)
 def load_book_from_csv( book: spl.PoseBook, filename, scale=0.08 ):
 	poses = book.poses
-	obj: bpy.types.Object = book.id_data
-	poses = book.poses
-	obj: bpy.types.Object = book.id_data
-	arm: bpy.types.Armature = obj.data
-	matrix_world = obj.matrix_world
-	bone_util_cls = mmd.BoneConverterPoseMode if arm.pose_position != 'REST' else mmd.BoneConverter
-
-	class _RestBone:
-		def __init__(self, b:bpy.types.PoseBone):
-			self.matrix_local = matrix_world @ b.bone.matrix_local
-
-	class _PoseBone: # world space
-		def __init__(self, b:bpy.types.PoseBone):
-			self.bone = _RestBone(b)
-			self.matrix = matrix_world @ b.matrix
-			self.matrix_basis = b.matrix_basis
-			self.location = b.location
-
-	converter_cache = {}
-	def _get_converter(b):
-		if b not in converter_cache:
-			converter_cache[b] = bone_util_cls(_PoseBone(b), scale, invert=False )
-		return converter_cache[b]
-	
+	arm = book.get_armature()
+	scale = scale / arm.scale[0] # consider armature scale
+	converters = {b: mmd.BoneConverter(b, scale) for b in arm.pose.bones}
 
 	# Format:
 	# line starts with ';' is comment. just discard.
@@ -531,28 +503,106 @@ def load_book_from_csv( book: spl.PoseBook, filename, scale=0.08 ):
 				rot = Vector( (float(row[7]), float(row[8]), float(row[9])) )
 
 				# convert to blender unit
-				pbone = obj.pose.bones.get(bone_name)
+				pbone = mmd.get_pose_bone_by_mmd_name(arm, bone_name)
 				if pbone is None:
-					print(f'Warning: Bone "{bone_name}" not found in "{obj.name}", skippping...')
+					print(f'Warning: Bone "{bone_name}" not found in "{arm.name}", skippping...')
 					continue
 
-				# use bone converter from mmd_tools to convert bone location and rotation to MMD unit
-				converter = _get_converter(pbone) 
-				loc = converter.convert_location( loc )
-				rot = mmd.degrees_to_quaternion( rot )
-				rot = converter.convert_rotation( [rot.x, rot.y, rot.z, rot.w] )
+				# # Convert using mmd_tools' BoneConverter
+				converter = converters[pbone]
+				loc = converter.convert_location(loc)
+				rot = utils.euler_to_quat_mmd(rot, degrees=True) # convert to quaternion
+				rot = converter.convert_rotation(rot)
 
-				# add a bone data
+				# Swap YZ axis for Blender
+				# loc = utils.swap_axis( loc, (0, 2, 1) ) # still in MMD unit
+				# rot = utils.swap_axis( rot, (0, 2, 1) )
+
+				# # convert to Blender unit
+				# loc = loc * scale / arm.scale[0] # convert to Blender unit (1/12.5 of MMD unit)
+				# rot = utils.degrees_to_quaternion( rot )  # specify the order for conversion
+				# # convert to bone local space
+				# loc, rot, _ = utils.to_armature_space( loc, rot, Vector((1,1,1)), pbone, invert=True )
+
 				bone = pose.bones.add()
-				bone.name = bone_name
+				bone.name = pbone.name
 				bone.location = loc
 				bone.rotation = rot
-				bone.scale = Vector((1.0,1.0,1.0))
+				bone.scale = Vector((1.0,1.0,1.0)) # Not in MMD
 
 				continue
 
 		book.name = os.path.basename(filename)
 
 	return
+
+
+# Save a pose as VPD file
+def export_pose_as_vpd( pose:spl.PoseData, filepath, scale=12.5 ):
+	arm = pose.get_armature()
+
+	vpd = mmd.VpdFile()
+
+	for bone in pose.bones:
+		bone: spl.BoneTransform
+
+		pbone = arm.pose.bones.get(bone.name)
+		if pbone is None:
+			print(f'Warning: Bone "{bone.name}" not found in "{arm.name}", skipping...')
+			continue
+
+		converter = mmd.BoneConverter(pbone, scale, invert=True)
+		loc = converter.convert_location(bone.location)
+		rot = converter.convert_rotation(bone.rotation)
+		rot = [rot.x, rot.y, rot.z, rot.w]
+
+		bone_name = pbone.mmd_bone.name_j if pbone.mmd_bone.name_j else pbone.name
+		vpd.bones.append( mmd.VpdBone( bone_name, loc, rot ) )
+	
+	vpd.osm_name = arm.name
+	vpd.save(filepath=filepath)
+	return
+
+# Load a pose from VPD file
+def import_pose_from_vpd( pose:spl.PoseData, filepath, scale=12.5 ):
+	arm = pose.get_armature()
+
+	vpd = mmd.VpdFile()
+	try:
+		vpd.load(filepath=filepath)
+	except mmd.InvalidFileError as e:
+		print(f'Error: Failed to load VPD file "{filepath}": {e}')
+		return None
+
+	pose.bones.clear()
+
+	for vpdbone in vpd.bones:
+		vpdbone: mmd.VpdBone
+
+		pbone = mmd.get_pose_bone_by_mmd_name(arm, vpdbone.bone_name)
+		if pbone is None:
+			print(f'Warning: Bone "{vpdbone.bone_name}" not found in "{arm.name}", skipping...')
+			continue
+
+		converter = mmd.BoneConverter(pbone, scale)
+		loc = Vector(vpdbone.location)
+		loc = converter.convert_location(loc)
+
+		rot = vpdbone.rotation
+		rot = Quaternion((rot[3], rot[0], rot[1], rot[2]))
+		rot = converter.convert_rotation(rot)
+
+		bd = pose.bones.add()
+		bd.name = pbone.name
+		bd.location = loc
+		bd.rotation = rot
+		bd.scale = Vector((1.0,1.0,1.0)) # Not in MMD
+	
+	pose.name = os.path.basename(filepath)
+	return pose
+
+
+
+
 
 

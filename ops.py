@@ -145,9 +145,9 @@ class SPL_OT_SaveToJson( bpy.types.Operator, ExportHelper ):
 
     # set self.filepath using book.name
     def invoke(self, context, event):
-        arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
+        arm = spl.get_armature()
         self.filepath = arm.name + "_posebook_" + book.name + ("(arm_space)" if self.use_armature_space else "")
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
@@ -236,9 +236,9 @@ class SPL_OT_SaveToCSV( bpy.types.Operator, ExportHelper ):
 
     # set self.filepath using book.name
     def invoke(self, context, event):
-        arm = context.object
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
+        arm = spl.get_armature()
         self.filepath = arm.name + "_posebook_" + book.name
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
@@ -286,10 +286,101 @@ class SPL_OT_LoadFromCSV( bpy.types.Operator, ImportHelper ):
         internal.load_book_from_csv(book, self.filepath, self.scale )
         return {'FINISHED'}
 
-    # Invoke the operator
+# Operator: Save active Pose to a VPD file
+class SPL_OT_SavePoseToVPD( bpy.types.Operator, ExportHelper ):
+    bl_idname = "spl.save_pose_to_vpd"
+    bl_label = "Save Pose to VPD"
+    bl_description = "Save the active pose to a VPD file (compatible with MMD applications)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    
+    filter_glob: StringProperty(default="*.vpd", options={'HIDDEN'})
+    filename_ext = '.vpd'
+
+    scale: FloatProperty(
+        name="Scale",
+        description="Scale factor (Blender -> MMD)",
+        default=12.5,
+        min=1.0,
+        max=100.0,
+    )
+
+    @classmethod
+    @requires_active_pose
+    def poll(cls, context):
+        return True
+    
     def invoke(self, context, event):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+        arm = spl.get_armature()
+        self.filepath = arm.name + "_pose_" + book.get_active_pose().name
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+        pose = book.get_active_pose()
+
+        internal.export_pose_as_vpd(pose, self.filepath, self.scale)
+
+        return {'FINISHED'}
+
+
+# Operator: Load a Pose from a VPD file
+class SPL_OT_LoadPoseFromVPD( bpy.types.Operator, ImportHelper ):
+    bl_idname = "spl.load_pose_from_vpd"
+    bl_label = "Load Pose from VPD"
+    bl_description = "Load a pose from a VPD file (compatible with MMD applications)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    filter_glob: StringProperty(default="*.vpd", options={'HIDDEN'})
+    filename_ext = '.vpd'
+
+    scale: FloatProperty(
+        name="Scale",
+        description="Scale factor (MMD -> Blender)",
+        default=0.08,
+        min=1.0,
+        max=100.0,
+    )
+
+    apply_pose: BoolProperty(
+        name="Apply Pose",
+        description="Apply the loaded pose",
+        default=True,
+    )
+
+    @classmethod
+    @requires_active_armature
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+
+        temp_pose_name = "temp_pose"
+        pose = book.add_pose(temp_pose_name) # import_pose_from_vpd() will set the name
+
+        # Load poses from file
+        vpd = internal.import_pose_from_vpd(pose, self.filepath, self.scale)
+
+        if vpd:
+            if self.apply_pose:
+                # Apply the pose to the armature
+                book.active_pose_index = len(book.poses) - 1
+                book.apply_single_pose(pose)
+
+            self.report({'INFO'}, f'Pose "{pose.name}" loaded successfully.')
+        else:
+            book.remove_pose_by_index(len(book.poses) - 1) # remove the temp pose
+            self.report({'ERROR'}, "Failed to load pose from VPD file.")
+
+        return {'FINISHED'}
+
+
 
 
 # Operator: Add PoseBook
@@ -411,13 +502,13 @@ class SPL_OT_ApplyPose( bpy.types.Operator ):
     def execute(self, context):
         spl = get_poselib_from_context(context)
         book = spl.get_active_book()
-        target_pose = book.get_active_pose()
+        target_pose = book.get_pose_by_index(self.pose_index)
 
-        for pose in book.poses:
-            if pose == target_pose:
-                pose.apply_pose()
-            else:
-                pose.reset_pose()
+        if target_pose is None:
+            self.report({'WARNING'}, "No pose found at the specified index.")
+            return {'CANCELLED'}
+
+        book.apply_single_pose(target_pose)
 
         return {'FINISHED'}
 
@@ -459,11 +550,11 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         name="Placement",
         description="Where to place the new pose in the PoseBook",
         items=(
-            ('INSERT', "Insert", "Insert the new pose below the active pose"),
-            ('APPEND', "Append", "Append the new pose at the end of the PoseBook"),
-            ('PREPEND', "Prepend", "Prepend the new pose at the beginning of the PoseBook"),
+            ('TOP', "Top", "Add the new pose at the top of the PoseBook"),
+            ('ACTIVE', "Active", "Insert the new pose at the next of active pose"),
+            ('BOTTOM', "Bottom", "Append the new pose at the bottom of the PoseBook"),
         ),
-        default='APPEND'
+        default='BOTTOM'
     )
 
 
@@ -500,13 +591,13 @@ class SPL_OT_AddPose( bpy.types.Operator ):
         book.apply_single_pose(new_pose)
 
         # Place the new pose in the PoseBook
-        if self.placement == 'APPEND':
+        if self.placement == 'BOTTOM':
             book.active_pose_index = len(book.poses) - 1
-        elif self.placement == 'INSERT':
+        elif self.placement == 'ACTIVE':
             new_index = book.active_pose_index + 1
             book.poses.move(len(book.poses) - 1, new_index) # this breaks new_pose reference
             book.active_pose_index = new_index
-        elif self.placement == 'PREPEND':
+        elif self.placement == 'TOP':
             book.poses.move(len(book.poses) - 1, 0) # this breaks new_pose reference
             book.active_pose_index = 0
         
@@ -1362,6 +1453,48 @@ class SPL_OT_BatchRenameBones(bpy.types.Operator, RenameOp):
 
         self.report({'INFO'}, "Batch renaming completed")
         return {'FINISHED'}
+
+
+# Operator: Sort Poses by Name or Category
+class SPL_OT_SortPoses(bpy.types.Operator):
+    bl_idname = "spl.sort_poses"
+    bl_label = "Sort Poses"
+    bl_description = "Sort poses in the active PoseBook by name or category"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    sort_by: EnumProperty(
+        name="Sort By",
+        description="Sort poses by name or category",
+        items=(
+            ('NAME', "Name", ""),
+            ('CATEGORY', "Category", ""),
+        ),
+        default='NAME'
+    )
+
+    reverse: BoolProperty(
+        name="Reverse",
+        description="Sort in reverse order",
+        default=False
+    )
+
+    @classmethod
+    @requires_active_posebook
+    def poll(cls, context):
+        return True
+
+    # Show Options first
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def execute(self, context):
+        spl = get_poselib_from_context(context)
+        book = spl.get_active_book()
+
+        book.sort_poses(self.sort_by, reverse=self.reverse)
+
+        return {'FINISHED'}
+
 
 
 # Register & Unregister
