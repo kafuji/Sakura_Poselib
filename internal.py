@@ -310,7 +310,15 @@ def save_book_to_json( book: spl.PoseBook, filepath, use_armature_space=False ):
 
 
 # Load PoseBook from a file (JSON)
-def load_book_from_json( book: spl.PoseBook, filepath ):
+def load_book_from_json( book: spl.PoseBook, filepath ) -> list[str]:
+	'''
+		Parameters:
+			book: PoseBook
+			filepath: str
+		Returns:
+			list of bone names that are not found in the armature
+	'''
+	bones_not_found = []
 	poses = book.poses
 	poses.clear()
 
@@ -337,12 +345,13 @@ def load_book_from_json( book: spl.PoseBook, filepath ):
 			rot = Quaternion( bone_data.get('rotation') )
 			sca = Vector( bone_data.get('scale', (1.0, 1.0, 1.0))  )
 
-			if space == 'ARMATURE':
-				pbone = arm.pose.bones.get(name)
-				if pbone is None:
-					print(f'Warning: Bone "{name}" not found in "{arm.name}", skipping...')
-					continue
+			pbone = arm.pose.bones.get(name)
+			if pbone is None:
+				bones_not_found.append(name)
 
+			if space == 'ARMATURE':
+				if pbone is None:
+					continue
 				loc, rot, sca = utils.to_armature_space( loc, rot, sca, pbone, invert=True )
 
 			bd = pose.bones.add()
@@ -353,7 +362,7 @@ def load_book_from_json( book: spl.PoseBook, filepath ):
 
 	# remove path and extension from filename
 	book.name = os.path.splitext( os.path.basename(filepath) )[0]
-	return
+	return bones_not_found
 
 
 # CSV format

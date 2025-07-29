@@ -183,7 +183,11 @@ class SPL_OT_LoadFromJson( bpy.types.Operator, ImportHelper ):
         book = spl.add_book()
 
         # Load poses from file
-        internal.load_book_from_json(book, self.filepath)
+        bones_not_found = internal.load_book_from_json(book, self.filepath)
+        for bone_name in bones_not_found:
+            self.report({'WARNING'}, f"Bone not found: {bone_name}.")
+        if len(bones_not_found) > 0:
+            self.report({'WARNING'}, "Some bones were not found in the armature. Please check the console for details.")
         return {'FINISHED'}
 
     # Invoke the operator
