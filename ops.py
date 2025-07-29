@@ -636,6 +636,14 @@ class SPL_OT_ReplacePose( bpy.types.Operator ):
     def poll(cls, context):
         return True
 
+    # Show Confirmation dialog first
+    def invoke(self, context, event):
+        prefs = bpy.context.preferences.addons[__package__].preferences
+        if prefs.confirm_on_replace:
+            return context.window_manager.invoke_confirm(self, event)
+        else:
+            return self.execute(context)
+
     def execute(self, context):
         # print("Replace Pose", self.pose_index)
         spl = get_poselib_from_context(context)

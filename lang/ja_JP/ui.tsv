@@ -15,6 +15,11 @@ Category	English	Japanese
 	Activate Poses on Book Change	ブック変更時にポーズをアクティブにする
 	Activate the poses on the active book when the active book is changed	アクティブブックが変更されたときに、アクティブブックのポーズを有効化します
 
+	Basic Behaviour Settings	基本動作設定
+
+	Confirm on Replace Pose	ポーズ置き換え時に確認
+	Show a confirmation dialog when replacing a pose	ポーズを置き換えるときに確認ダイアログを表示します
+
 	Developer Settings	開発者設定
 	Developer Mode	開発者モード
 

@@ -43,6 +43,12 @@ class SPL_Preferences(bpy.types.AddonPreferences):
         default=False,
     )
 
+    confirm_on_replace: BoolProperty(
+        name="Confirm on Replace Pose",
+        description="Show a confirmation dialog when replacing a pose",
+        default=False,
+    )
+
     def draw(self,context: bpy.types.Context):
         layout:bpy.types.UILayout = self.layout
 
@@ -57,8 +63,9 @@ class SPL_Preferences(bpy.types.AddonPreferences):
 
         # Basic Behaviour Settings
         box = layout.box()
-        box.label(text="Basic Behaviour")
+        box.label(text="Basic Behaviour Settings")
         box.prop(self, "activate_poses_on_book_change", icon='FILE_REFRESH')
+        box.prop(self, "confirm_on_replace", icon='CHECKMARK')
 
         # Developer Settings
         # box = layout.box()
