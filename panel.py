@@ -104,7 +104,7 @@ class SPL_UL_BoneList(UIList):
 
 		row = l.row(align=True)
 		row.alert = pbone is None
-		row.prop( item, 'name', text='', emboss=False, icon='BONE_DATA' )
+		row.prop( item, 'name', text='', emboss=True, icon='BONE_DATA' )
 		row.operator( 'spl.remove_bone_from_pose', text='', icon='REMOVE').bone_index = index
 
 

@@ -34,6 +34,19 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/07/30: v1.4.1
+  - Load PoseBook from JSON:
+    - Added warning message when matching bone is missing in the Armature.
+  - Replace Pose:
+    - Added confirmation dialog when replacing a pose.
+      - This is optional. Set "Confirm on Replace Pose" option in the addon preferences to enable it.
+  - GUI:
+    - Removed Sakura Poselib panel from the Armature data tab in the Properties editor.
+      - It is now only available in the 3D Viewport side panel.
+      - Bone List panel was moved to the 3D Viewport side panel.
+      - Bone names in the Bone List panel are now editable.
+  - Minor bug fixes and improvements.
+
 - 2025/04/22: v.1.4.0
   - Added "Sort Poses" operator on Pose List menu.
     - Sorts poses by name or category.
