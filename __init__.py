@@ -3,7 +3,7 @@ bl_info = {
 	"author": "Kafuji Sato",
 	"version": (1, 4, 1),
 	"blender": (2, 93, 0),
-	"location": "Armature Properties > Sakura PoseLib / Side Panel -> Sakura",
+	"location": "3D Viewport Side Panel -> Sakura -> Sakura PoseLib",
 	"description": "Yet another pose library with handful of features",
 	"warning": "",
 	"doc_url": "",

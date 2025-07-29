@@ -24,8 +24,7 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Where to find
 
-- Skura tab at 3D Viewport side panel.
-- Sakura Poselib subpanel in the Armature property panel.
+- Sakura tab at 3D Viewport side panel.
 
 ## Online Documents
 
