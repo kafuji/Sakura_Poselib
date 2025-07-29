@@ -26,10 +26,17 @@ POSE_CATEGORIES = [
 def resolve_naming_collision(self, collection):
 	except_me = [item for item in collection if item != self]
 	name_set = {item.name for item in except_me}
+	if self.name not in name_set:
+		return
 
-	# Check for duplicate names and change the name accordingly
+	# Deep copy the name for safety (self.name is RNA object reference, not a string)
 	self_name = self.name[:]
 
+	# remove .001, 002 .. suffix if exists
+	if re.match(r".*\.\d{3}$", self_name):
+		self_name = re.sub(r"\.\d{3}$", "", self_name)
+
+	# Try to find a unique name by appending .001, .002, etc.
 	for counter in range(1, 1000):
 		if self.name not in name_set:
 			break
@@ -124,16 +131,34 @@ def update_combined_pose( book: "PoseBook" ):
 
 # Transform Data for each bone
 class BoneTransform(PropertyGroup):
-	name: StringProperty(name="Bone Name")
+	# callback for bone name change
+	def update_bone_name(self, context):
+		pose = self.get_pose()
+		if not pose:
+			return
+		# resolve naming collision
+		resolve_naming_collision(self, pose.bones)
+		return
+
+	name: StringProperty(name="Bone Name", update=update_bone_name)
 	location: FloatVectorProperty(name="Location", size=3, default=(0, 0, 0), subtype='TRANSLATION' )
 	rotation: FloatVectorProperty(name="Rotation", size=4, default=(1, 0, 0, 0), subtype='QUATERNION') # Quartanion
 	scale: FloatVectorProperty(name="Scale", size=3, default=(1, 1, 1), subtype='XYZ')
+
+	# get the pose this bone belongs to
+	def get_pose(self) -> Optional["PoseData"]:
+		path = self.path_from_id() # sakura_poselib.books[n].poses[n].bones[n]'
+		# strip the last part
+		path = re.sub(r"\.[^.]*$", "", path)
+		# resolve the path
+		return self.id_data.path_resolve(path)
 
 	def copy_from(self, bone):
 		self.name = bone.name
 		self.location = bone.location
 		self.rotation = bone.rotation
 		self.scale = bone.scale
+
 
 # Data for each pose
 class PoseData(PropertyGroup):

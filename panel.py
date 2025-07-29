@@ -104,7 +104,7 @@ class SPL_UL_BoneList(UIList):
 
 		row = l.row(align=True)
 		row.alert = pbone is None
-		row.label( text=item.name, icon='BONE_DATA')
+		row.prop( item, 'name', text='', emboss=False, icon='BONE_DATA' )
 		row.operator( 'spl.remove_bone_from_pose', text='', icon='REMOVE').bone_index = index
 
 
@@ -347,7 +347,7 @@ class SPL_PT_PoseLibPropPanel(Panel):
 # Panel to display Sakura Poselib in the 3D View Side Panel
 class SPL_PT_PoseLibrarySidePanel(Panel):
 	bl_label = "Sakura Poselib"
-	bl_idname = "SPL_PT_PoseLibSidePanel"
+	bl_idname = "SPL_PT_PoseLibrarySidePanel"
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
 	bl_category = "Sakura"
@@ -365,10 +365,10 @@ class SPL_PT_PoseLibrarySidePanel(Panel):
 class SPL_PT_PoseBoneData(Panel):
 	bl_label = "Pose Bone Data"
 	bl_idname = "SPL_PT_PoseBoneData"
-	bl_parent_id = "SPL_PT_PoseLibPropPanel"
-	bl_space_type = 'PROPERTIES'
-	bl_region_type = 'WINDOW'
-	bl_context = "data"
+	bl_parent_id = "SPL_PT_PoseLibrarySidePanel"
+	bl_space_type = 'VIEW_3D'
+	bl_region_type = 'UI'
+	# bl_context = "data"
 	bl_options = {'DEFAULT_CLOSED'}
 
 	@classmethod
@@ -455,7 +455,7 @@ _classes = [
 	SPL_MT_PoseListMenu,
 	SPL_MT_PoseListDisplayMenu,
 	SPL_UL_BoneList,
-	SPL_PT_PoseLibPropPanel,
+	# SPL_PT_PoseLibPropPanel,
 	SPL_PT_PoseLibrarySidePanel,
 	SPL_PT_PoseBoneData,
 	# SPL_PT_PoseBookConverter,
