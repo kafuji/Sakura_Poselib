@@ -33,6 +33,10 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/07/30: v.1.4.2
+  - Changed display style of Bone names in the Bone list for better visibility.
+  - Update README and init.py (bl_info) to describe GUI changes.
+
 - 2025/07/30: v1.4.1
   - Load PoseBook from JSON:
     - Added warning message when matching bone is missing in the Armature.
