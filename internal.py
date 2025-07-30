@@ -318,7 +318,7 @@ def load_book_from_json( book: spl.PoseBook, filepath ) -> list[str]:
 		Returns:
 			list of bone names that are not found in the armature
 	'''
-	bones_not_found = []
+	bones_not_found = {}
 	poses = book.poses
 	poses.clear()
 
@@ -347,7 +347,7 @@ def load_book_from_json( book: spl.PoseBook, filepath ) -> list[str]:
 
 			pbone = arm.pose.bones.get(name)
 			if pbone is None:
-				bones_not_found.append(name)
+				bones_not_found[name] = True
 
 			if space == 'ARMATURE':
 				if pbone is None:
@@ -362,7 +362,7 @@ def load_book_from_json( book: spl.PoseBook, filepath ) -> list[str]:
 
 	# remove path and extension from filename
 	book.name = os.path.splitext( os.path.basename(filepath) )[0]
-	return bones_not_found
+	return [name for name in bones_not_found.keys()]
 
 
 # CSV format
