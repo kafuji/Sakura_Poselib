@@ -377,7 +377,7 @@ _POSE_CATEGORIES = [
 def save_book_to_csv( book: spl.PoseBook, filename, scale=12.5, use_mmd_bone_names=True, use_alt_names=False ):
 	poses = book.poses
 	arm = book.get_armature()
-	scale = scale * arm.scale[0] # consider armature scale
+	scale = scale * arm.matrix_world.to_scale()[0] # consider armature scale, only uniform scale is supported, using scale.x here
 
 	converters = {b: mmd.BoneConverter(b, scale, invert=True) for b in arm.pose.bones}
 

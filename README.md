@@ -36,6 +36,7 @@ You can also export them for other applications (currently PMX Editor is support
 - 2025/07/30: v.1.4.2
   - Changed display style of Bone names in the Bone list for better visibility.
   - Update README and init.py (bl_info) to describe GUI changes.
+  - Save Book to CSV: Now it saves pose data with the correct scale when the armature has a parent with scale.
 
 - 2025/07/30: v1.4.1
   - Load PoseBook from JSON:
