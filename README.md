@@ -33,10 +33,12 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
-- 2025/07/30: v.1.4.2
+- 2025/08/09: v1.4.3
+  - Fixed an issue where the pose data was not being saved correctly when the armature had a parent with scale.
+
+- 2025/07/30: v1.4.2
   - Changed display style of Bone names in the Bone list for better visibility.
   - Update README and init.py (bl_info) to describe GUI changes.
-  - Save Book to CSV: Now it saves pose data with the correct scale when the armature has a parent with scale.
 
 - 2025/07/30: v1.4.1
   - Load PoseBook from JSON:
@@ -51,7 +53,7 @@ You can also export them for other applications (currently PMX Editor is support
       - Bone names in the Bone List panel are now editable.
   - Minor bug fixes and improvements.
 
-- 2025/04/22: v.1.4.0
+- 2025/04/22: v1.4.0
   - Added "Sort Poses" operator on Pose List menu.
     - Sorts poses by name or category.
   - Added "Load Pose from VPD" and "Save Pose to VPD" operators.
