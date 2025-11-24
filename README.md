@@ -33,6 +33,10 @@ You can also export them for other applications (currently PMX Editor is support
 
 ## Change Log
 
+- 2025/11/24: v1.4.4
+  - Updated bone selection code to support Blender 5.0.
+    - Now works correctly in both Pose Mode and Edit Mode.
+
 - 2025/08/09: v1.4.3
   - Fixed an issue where the pose data was not being saved correctly when the armature had a parent with scale.
 

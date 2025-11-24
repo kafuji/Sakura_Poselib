@@ -945,8 +945,11 @@ class SPL_OT_SelectBonesInPose( bpy.types.Operator ):
             return {'CANCELLED'}
 
         # Deselect all bones
-        for bone in arm.data.bones:
-            bone.select = False
+        for pbone in arm.pose.bones:
+            pbone.select = False
+        if arm.mode == 'EDIT':
+            for ebone in arm.data.edit_bones:
+                ebone.select = False
 
         # Select bones used in the pose
         pose = book.poses[pose_index]
@@ -957,7 +960,13 @@ class SPL_OT_SelectBonesInPose( bpy.types.Operator ):
 
             pbone = arm.pose.bones[bone_name]
             pbone.bone.hide_select = False
-            pbone.bone.select = True
+            if bpy.app.version < (5,0,0): # 2.x~4.x
+                pbone.bone.select = True
+            else: # 5.x~
+                pbone.select = True
+            if arm.mode == 'EDIT':
+                ebone = arm.data.edit_bones[bone_name]
+                ebone.select = True
 
             # Show the bone in the viewport
             pbone.bone.hide = False
