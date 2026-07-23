@@ -6,8 +6,7 @@ from typing import Tuple
 # Check if mmd_tools is installed
 def is_mmd_tools_installed():
     addons = bpy.context.preferences.addons
-    return 'mmd_tools' in addons or 'bl_ext.blender_org.mmd_tools' in addons # check addon and extension (Blender 4.2 or later)
-
+    return any('mmd_tools' in key for key in addons.keys())
 
 # get mmd root object
 def get_model_root(obj: bpy.types.Object) -> bpy.types.Object:
